@@ -1,10 +1,12 @@
 #define TILT_PIN 23
 
-volatile bool tilted = false;
-volatile unsigned long tiltCount = 0;
+volatile bool tiltDetected = false;
+unsigned long lastTiltTime = 0;
+const unsigned long tiltHoldTime = 80; // ms to keep reading as "1"
 
 void IRAM_ATTR tiltISR() {
-  tilted = true;
+  tiltDetected = true;
+  lastTiltTime = millis();
 }
 
 void setup() {
@@ -17,15 +19,18 @@ void setup() {
 }
 
 void loop() {
-  if (tilted) {
-    tilted = false;
+  unsigned long now = millis();
 
-    //delay(10); // debounce
-
-    if (digitalRead(TILT_PIN) == LOW) {
-      tiltCount++;
-      Serial.print("Tilt detected! Total: ");
-      Serial.println(tiltCount);
-    }
+  if (tiltDetected) {
+    tiltDetected = false;
   }
+
+  // If a tilt happened recently, show "1"
+  if (now - lastTiltTime < tiltHoldTime) {
+    Serial.println(1);
+  } else {
+    Serial.println(0);
+  }
+
+  delay(20); // controls print rate
 }
