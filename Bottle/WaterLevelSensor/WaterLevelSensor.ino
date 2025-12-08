@@ -46,7 +46,7 @@ private:
 public:
     WaterLevelSensor(std::vector<int> pins) {
         for (int i=0; i < pins.size(); i++) {
-            _probes.push_back(WaterProbe(pins[i], TOUCH_THRESHOLD, i));
+            _probes.push_back(WaterProbe(pins[i], TOUCH_THRESHOLD, i+1));
         }
     }
 
@@ -97,17 +97,17 @@ public:
 // MAIN SETUP
 // ==========================================
 
-//WaterLevelSensor waterLevelSensor({4, 15, 13, 12});
-//
-//void setup() {
-//    Serial.begin(115200);
-//    delay(1000);
-//
-//    waterLevelSensor.setup();
-//}
-//
-//void loop() {
-//    waterLevelSensor.update();
-//    waterLevelSensor.debugRaw();
-//    delay(1000);
-//}
+WaterLevelSensor waterLevelSensor({4, 15, 13, 12});
+
+void setup() {
+   Serial.begin(115200);
+   delay(1000);
+
+   waterLevelSensor.setup();
+}
+
+void loop() {
+   waterLevelSensor.update();
+   waterLevelSensor.debugRaw();
+   delay(1000);
+}
