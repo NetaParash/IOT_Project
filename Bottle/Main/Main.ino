@@ -1,43 +1,31 @@
 #include <Arduino.h>
-#include "KeypadSensor.h"
+#include "ButtonInput.h"
 #include "Screen.h"
 
-// Full 4×3 keypad layout — library requires this
-char keys[4][3] = {
-    {'1','2','3'},
-    {'4','5','6'},
-    {'7','8','9'},
-    {'*','0','#'}
-};
+// pin matching the Arduino example
+const int buttonPin = 4;
 
-byte rowPins[4] = {25, 26, 27, 16};   // row 4 = 16, others = safe dummy GPIOs
-byte colPins[3] = {17, 25, 18};       // only col 1=17 and col 3=18 real
-int water = 0;
+// Create button object
+Button button(buttonPin);
 
-
-KeypadSensor keypadSensor(keys, rowPins, colPins);
-
+// Existing screen class from your project
 Screen screen(Serial, 21, 22);
 
 void setup() {
     Serial.begin(115200);
-    screen.setup();
-    screen.print("Keypad Ready");
+
+    button.setup();       // configure button
+    screen.setup();       // init OLED
+
+    screen.print("Button Test Ready");
 }
 
 void loop() {
-    keypadSensor.update();
-
-    if (keypadSensor.hasEvent()) {
-        KeyEvent e = keypadSensor.getEvent();
-
-        if (e == KeyEvent::NEXT) {
-            Serial.println("NEXT");
-            screen.print("NEXT");
-        }
-        if (e == KeyEvent::SELECT) {
-            Serial.println("SELECT");
-            screen.print("SELECT");
-        }
-    }
+    if (button.isPressed()) {
+        screen.print("Pressed");
+        Serial.println("Pressed");}
+    else{
+        screen.print("Not Pressed");
+        Serial.println("Not Pressed");}
+    delay(100);  // slow down screen flicker
 }
