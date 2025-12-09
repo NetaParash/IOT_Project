@@ -8,6 +8,7 @@ Screen::Screen(HardwareSerial& s, int sda, int scl)
 {
 }
 
+
 void Screen::setup() {
     Wire.begin(sdaPin, sclPin);
 
@@ -16,7 +17,6 @@ void Screen::setup() {
     display.setTextSize(1);
     display.setTextColor(SH110X_WHITE);
     display.setCursor(0, 0);
-
     serial.println("Screen initialized.");
 }
 
