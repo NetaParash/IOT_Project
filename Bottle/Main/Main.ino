@@ -1,34 +1,43 @@
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SH110X.h>
+#include <Arduino.h>
+#include "KeypadSensor.h"
+#include "Screen.h"
 
-#include "Screen.h"   // adjust path if needed
+// Full 4×3 keypad layout — library requires this
+char keys[4][3] = {
+    {'1','2','3'},
+    {'4','5','6'},
+    {'7','8','9'},
+    {'*','0','#'}
+};
 
-// ------------------------------------------------------
-//     I2C Pins for OLED Display (ESP32 example)
-// ------------------------------------------------------
-#define SDA_PIN 21
-#define SCL_PIN 22
-// Create screen object using your new ctor
-Screen screen(Serial, SDA_PIN, SCL_PIN);
+byte rowPins[4] = {25, 26, 27, 16};   // row 4 = 16, others = safe dummy GPIOs
+byte colPins[3] = {17, 25, 18};       // only col 1=17 and col 3=18 real
+int water = 0;
 
-// ------------------------------------------------------
-//                       SETUP
-// ------------------------------------------------------
+
+KeypadSensor keypadSensor(keys, rowPins, colPins);
+
+Screen screen(Serial, 21, 22);
+
 void setup() {
-  Serial.begin(115200);
-  delay(300);
-
-  Serial.println("Initializing Screen...");
-  screen.setup();
-
-  Serial.println("Displaying test text...");
-  screen.print("Hello Bottle!");
+    Serial.begin(115200);
+    screen.setup();
+    screen.print("Keypad Ready");
 }
 
-// ------------------------------------------------------
-//                       LOOP
-// ------------------------------------------------------
 void loop() {
-  // Nothing here yet — screen class works independently
+    keypadSensor.update();
+
+    if (keypadSensor.hasEvent()) {
+        KeyEvent e = keypadSensor.getEvent();
+
+        if (e == KeyEvent::NEXT) {
+            Serial.println("NEXT");
+            screen.print("NEXT");
+        }
+        if (e == KeyEvent::SELECT) {
+            Serial.println("SELECT");
+            screen.print("SELECT");
+        }
+    }
 }
