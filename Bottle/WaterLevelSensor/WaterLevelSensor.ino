@@ -57,7 +57,7 @@ public:
         Serial.println("System Initialized.");
     }
 
-    void update() {
+    int getWaterLevel() {
         int foundLevel = 0;
         
         for (int i = 0; i < _probes.size(); i++) {
@@ -68,6 +68,7 @@ public:
         }
         
         printStatus(foundLevel);
+        return (foundLevel * 100) / _probes.size();
     }
 
     void printStatus(int level) {
@@ -97,17 +98,17 @@ public:
 // MAIN SETUP
 // ==========================================
 
-WaterLevelSensor waterLevelSensor({4, 15, 13, 12});
-
-void setup() {
-   Serial.begin(115200);
-   delay(1000);
-
-   waterLevelSensor.setup();
-}
-
-void loop() {
-   waterLevelSensor.update();
-   waterLevelSensor.debugRaw();
-   delay(1000);
-}
+//WaterLevelSensor waterLevelSensor({4, 15, 13, 12});
+//
+//void setup() {
+//   Serial.begin(115200);
+//   delay(1000);
+//
+//   waterLevelSensor.setup();
+//}
+//
+//void loop() {
+//   waterLevelSensor.getWaterLevel();
+//   waterLevelSensor.debugRaw();
+//   delay(1000);
+//}
