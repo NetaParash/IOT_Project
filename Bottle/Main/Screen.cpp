@@ -10,7 +10,7 @@ Screen::Screen(HardwareSerial& s, int sda, int scl)
 
 
 void Screen::setup() {
-    Wire.begin(sdaPin, sclPin);
+    // Wire.begin(sdaPin, sclPin);
 
     display.begin(OLED_ADDR, true);
     display.clearDisplay();
