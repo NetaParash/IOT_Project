@@ -3,7 +3,9 @@
 #include "Screen.h"
 #include "GyroSensor.h"
 #include "ButtonInput.h"
+#include <deque>
 
+using namespace std;
 // ========================
 // WATER LEVEL PINS (Bottom → Top)
 // ========================
@@ -28,7 +30,7 @@ Button button(4);
 // TIMING
 // ========================
 unsigned long lastWaterCheck = 0;
-const unsigned long WATER_INTERVAL_MS = 10;
+const unsigned long WATER_INTERVAL_MS = 100;
 
 // ========================
 // MENU STATE
@@ -41,6 +43,7 @@ MenuScreen currentScreen = WATER_SCREEN;
 // ========================
 int lastStableLevel = 0;
 int totalDrankML = 0;
+deque<int> lastWaterLevel;
 const int BOTTLE_ML = 500;
 
 void setup() {
@@ -93,22 +96,29 @@ void loop() {
     // =====================================================
     // SAMPLE WATER LEVEL EVERY 10ms
     // =====================================================
+
     if (now - lastWaterCheck >= WATER_INTERVAL_MS) {
         lastWaterCheck = now;
 
         int levelPercent = waterLevelSensor.getWaterLevel();
         int waterML = (levelPercent * BOTTLE_ML) / 100;
 
-        // ===== Track drinking amount =====
-        if (lastStableLevel > 0 && levelPercent < lastStableLevel) {
-
-            int deltaPercent = lastStableLevel - levelPercent;
-            int deltaML = (deltaPercent * BOTTLE_ML) / 100;
-
-            totalDrankML += deltaML;
-
+        lastWaterLevel.push_back(waterML);
+        if(lastWaterLevel.size() == 10){
+            int all = lastWaterLevel.front();
+            for(int m: lastWaterLevel){
+                if(m!=all){
+                    lastWaterLevel.pop_front();
+                    return;
+                }
+            }
+            lastWaterLevel.pop_front();
+            if (lastStableLevel > all) {
+                totalDrankML += (lastStableLevel - all);
+            }
+            lastStableLevel = all;
         }
-        lastStableLevel = levelPercent;
+       
             
 
         // =====================================================

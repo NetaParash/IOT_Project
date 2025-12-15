@@ -17,6 +17,9 @@ private:
     // Thresholds for stability
     const float GYRO_THRESHOLD = 3.0;      // deg/sec
     const int STABILITY_WINDOW_MS = 10;    // ms
+    const float ACCEL_TILT_THRESHOLD = 0.15;   // g
+    const float ACCEL_Z_TARGET = 1.0;          // g
+
 
 public:
     GyroSensor(int sda, int scl, int vcc = -1)
@@ -52,22 +55,34 @@ public:
             sensors_event_t accel, gyro, temp;
             mpu.getEvent(&accel, &gyro, &temp);
 
+            // ---- Gyro: check no rotation ----
             float gx = gyro.gyro.x * 180 / PI; // rad/s → deg/s
             float gy = gyro.gyro.y * 180 / PI;
             float gz = gyro.gyro.z * 180 / PI;
 
-            // If any exceeds threshold → not stable
             if (abs(gx) > GYRO_THRESHOLD ||
                 abs(gy) > GYRO_THRESHOLD ||
-                abs(gz) > GYRO_THRESHOLD) 
+                abs(gz) > GYRO_THRESHOLD)
             {
-                return false;
+                return false; // rotating
             }
 
-            delay(1);  // reduces noise
-        }
+            // ---- Accelerometer: check horizontal ----
+            // Convert m/s^2 → g
+            float ax = accel.acceleration.x / 9.81;
+            float ay = accel.acceleration.y / 9.81;
+            float az = accel.acceleration.z / 9.81;
 
-        return true; // fully stable during window
+            // Must be flat: X≈0, Y≈0, Z≈1g
+            if (abs(ax) > ACCEL_TILT_THRESHOLD ||
+                abs(ay) > ACCEL_TILT_THRESHOLD ||
+                abs(az - ACCEL_Z_TARGET) > ACCEL_TILT_THRESHOLD)
+            {
+                return false; // tilted
+            }
+            delay(1);
+        }
+        return true; // stable AND horizontal
     }
 };
 

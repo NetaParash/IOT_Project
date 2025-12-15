@@ -5,6 +5,7 @@
  */
 
 #include <Arduino.h>
+#include "GyroSensor.h"
 #include <vector>
 
 // ==========================================
