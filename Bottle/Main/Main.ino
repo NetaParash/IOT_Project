@@ -5,14 +5,34 @@
 #include "ButtonInput.h"
 #include <deque>
 
+// >>> ADDED
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <WiFiClientSecure.h>
+
+// <<< ADDED
+
 using namespace std;
+
+// ========================
+// WIFI + BACKEND CONFIG  (ADDED)
+// ========================
+const char* WIFI_SSID = "BONITI2";
+const char* WIFI_PASS = "25072024";
+const char* BACKEND_URL =
+    "https://football-site-backend.onrender.com/api/bottle/data";
+
+// send to backend every 5 seconds (safe)
+unsigned long lastBackendSend = 0;
+const unsigned long BACKEND_INTERVAL_MS = 5000;
+
 // ========================
 // WATER LEVEL PINS (Bottom → Top)
 // ========================
-WaterLevelSensor waterLevelSensor({14, 27, 33, 32});
+WaterLevelSensor waterLevelSensor({15, 32, 33, 13});
 
 // ========================
-// OLED SCREEN (21/22 I2C)
+// OLED SCREEN
 // ========================
 Screen screen(Serial, 21, 22);
 
@@ -46,106 +66,64 @@ int totalDrankML = 0;
 deque<int> lastWaterLevel;
 const int BOTTLE_ML = 500;
 
+// ========================
+// WIFI CONNECT (ADDED)
+// ========================
+void connectToWiFi() {
+    Serial.print("Connecting to WiFi");
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+
+    Serial.println("\nWiFi connected");
+    Serial.print("ESP32 IP: ");
+    Serial.println(WiFi.localIP());
+}
+
+// ========================
+// SEND DATA TO BACKEND (ADDED)
+// ========================
+void sendToBackend(int levelPercent, int totalDrankML) {
+    if (WiFi.status() != WL_CONNECTED) return;
+
+    WiFiClientSecure client;
+    client.setInsecure();   // HTTPS without certificate (PoC)
+
+    HTTPClient http;
+    http.begin(client, BACKEND_URL);
+    http.addHeader("Content-Type", "application/json");
+
+    String payload = "{";
+    payload += "\"water_level_percent\": " + String(levelPercent) + ",";
+    payload += "\"total_drank_ml\": " + String(totalDrankML) + ",";
+    payload += "\"timestamp\": " + String(millis());
+    payload += "}";
+
+    int code = http.POST(payload);
+    Serial.print("Backend POST -> ");
+    Serial.println(code);
+
+    http.end();
+}
+
+
+// ==========================================
+// MAIN SETUP
+// ==========================================
+
+
 void setup() {
-    Serial.begin(115200);
-    delay(500);
+  Serial.begin(115200);
+  delay(1000);
 
-    Wire.begin(21, 22); // SHARED I2C FOR SCREEN + MPU6050
-
-    screen.setup();
-    screen.print("Initializing...");
-
-    button.setup();
-    gyro.setup();
-    waterLevelSensor.setup();
-
-    screen.print("System Ready");
+  waterLevelSensor.setup();
 }
 
 void loop() {
-    unsigned long now = millis();
-
-    // =====================================================
-    // UPDATE BUTTON (required for wasPressed)
-    // =====================================================
-    button.update();
-
-    // =====================================================
-    // BUTTON PRESS → SWITCH SCREEN
-    // =====================================================
-    if (button.wasPressed()) {
-        if (currentScreen == WATER_SCREEN)
-            currentScreen = DRANK_SCREEN;
-        else
-            currentScreen = WATER_SCREEN;
-    }
-
-    // =====================================================
-    // STABILITY CHECK
-    // =====================================================
-    bool stable = gyro.isStable();
-
-    if (!stable) {
-        String msg =
-            "Please maintain\n"
-            "the bottle stable!";
-        screen.print(msg);
-        return;
-    }
-
-    // =====================================================
-    // SAMPLE WATER LEVEL EVERY 10ms
-    // =====================================================
-
-    if (now - lastWaterCheck >= WATER_INTERVAL_MS) {
-        lastWaterCheck = now;
-
-        int levelPercent = waterLevelSensor.getWaterLevel();
-        int waterML = (levelPercent * BOTTLE_ML) / 100;
-
-        lastWaterLevel.push_back(waterML);
-        if(lastWaterLevel.size() == 10){
-            int all = lastWaterLevel.front();
-            for(int m: lastWaterLevel){
-                if(m!=all){
-                    lastWaterLevel.pop_front();
-                    return;
-                }
-            }
-            lastWaterLevel.pop_front();
-            if (lastStableLevel > all) {
-                totalDrankML += (lastStableLevel - all);
-            }
-            lastStableLevel = all;
-        }
-       
-            
-
-        // =====================================================
-        // MENU DRAWING
-        // =====================================================
-        if (currentScreen == WATER_SCREEN) {
-            String text =
-                "Water Level\n"
-                + String(levelPercent) + "% (" + waterML + " ml)\n\n"
-                "Press button to see\n"
-                "Total Drank";
-            screen.print(text);
-        }
-        else {
-            String text =
-                "Total Drank\n"
-                + String(totalDrankML) + " ml\n\n"
-                "Press button to see\n"
-                "Water Level";
-            screen.print(text);
-        }
-
-        // Debug output
-        Serial.print("Level: ");
-        Serial.print(levelPercent);
-        Serial.print("%  Drank: ");
-        Serial.print(totalDrankML);
-        Serial.println(" ml");
-    }
+  waterLevelSensor.getWaterLevel();
+  waterLevelSensor.debugRaw();
+  delay(1000);
 }
