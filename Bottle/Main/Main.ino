@@ -6,6 +6,28 @@
 #include <deque>
 
 using namespace std;
+
+
+// ========================
+// MODES
+// ========================
+enum BottleMode { 
+    REGULAR, 
+    SPORTS 
+};
+
+struct ModeConfig {
+    String name;     
+    int dailyGoal;   
+    // TODO: Add time delta for notifications
+};
+
+static const ModeConfig modes[] = {
+    // Name      // Goal (mL)
+    { "Regular", 2000 },  // Index matches REGULAR
+    { "Sports",  3000 }   // Index matches SPORTS
+};
+
 // ========================
 // WATER LEVEL PINS (Bottom → Top)
 // ========================
@@ -22,21 +44,29 @@ Screen screen(Serial, 21, 22);
 GyroSensor gyro(21, 22);
 
 // ========================
-// BUTTON
+// BUTTONS
 // ========================
-Button button(4);
+Button btnNext(5);
+Button btnSelect(4); 
 
 // ========================
 // TIMING
 // ========================
 unsigned long lastWaterCheck = 0;
 const unsigned long WATER_INTERVAL_MS = 100;
+const unsigned long SCREEN_REFRESH_RATE_MS = 100;
 
 // ========================
 // MENU STATE
 // ========================
-enum MenuScreen { WATER_SCREEN, DRANK_SCREEN };
-MenuScreen currentScreen = WATER_SCREEN;
+enum MenuState {
+    STATE_HOME,
+    STATE_SET_REGULAR,
+    STATE_SET_SPORTS
+};
+
+MenuState currentScreen = STATE_HOME;
+BottleMode activeMode = REGULAR;
 
 // ========================
 // DRINK TRACKING
@@ -44,6 +74,7 @@ MenuScreen currentScreen = WATER_SCREEN;
 int lastStableLevel = 0;
 int totalDrankML = 0;
 deque<int> lastWaterLevel;
+int waterML = 0;
 const int BOTTLE_ML = 500;
 
 void setup() {
@@ -55,7 +86,8 @@ void setup() {
     screen.setup();
     screen.print("Initializing...");
 
-    button.setup();
+    btnNext.setup();
+    btnSelect.setup();
     gyro.setup();
     waterLevelSensor.setup();
 
@@ -66,18 +98,43 @@ void loop() {
     unsigned long now = millis();
 
     // =====================================================
-    // UPDATE BUTTON (required for wasPressed)
+    // UPDATE BUTTONS (required for wasPressed)
     // =====================================================
-    button.update();
+    btnSelect.update();   
+    btnNext.update();
 
     // =====================================================
-    // BUTTON PRESS → SWITCH SCREEN
+    // MENU NAVIGATION LOGIC (STATE MACHINE)
     // =====================================================
-    if (button.wasPressed()) {
-        if (currentScreen == WATER_SCREEN)
-            currentScreen = DRANK_SCREEN;
-        else
-            currentScreen = WATER_SCREEN;
+    switch (currentScreen) {
+        // --- HOME SCREEN ---
+        case STATE_HOME:
+            if (btnNext.wasPressed()) {
+                currentScreen = STATE_SET_REGULAR;
+            }
+            break;
+
+        // --- SELECT REGULAR MODE ---
+        case STATE_SET_REGULAR:
+            if (btnSelect.wasPressed()) {
+                activeMode = REGULAR; 
+                currentScreen = STATE_HOME;
+            } 
+            else if (btnNext.wasPressed()) {
+                currentScreen = STATE_SET_SPORTS;
+            }
+            break;
+
+        // --- SELECT SPORTS MODE ---
+        case STATE_SET_SPORTS:
+            if (btnSelect.wasPressed()) {
+                activeMode = SPORTS; 
+                currentScreen = STATE_HOME;
+            }
+            else if (btnNext.wasPressed()) {
+                currentScreen = STATE_HOME;
+            }
+            break;
     }
 
     // =====================================================
@@ -85,67 +142,63 @@ void loop() {
     // =====================================================
     bool stable = gyro.isStable();
 
-    if (!stable) {
-        String msg =
-            "Please maintain\n"
-            "the bottle stable!";
-        screen.print(msg);
-        return;
-    }
-
     // =====================================================
     // SAMPLE WATER LEVEL EVERY 10ms
     // =====================================================
+    if (stable) {
+        if (now - lastWaterCheck >= WATER_INTERVAL_MS) {
+            lastWaterCheck = now;
 
-    if (now - lastWaterCheck >= WATER_INTERVAL_MS) {
-        lastWaterCheck = now;
+            int levelPercent = waterLevelSensor.getWaterLevel();
+            waterML = (levelPercent * BOTTLE_ML) / 100;
 
-        int levelPercent = waterLevelSensor.getWaterLevel();
-        int waterML = (levelPercent * BOTTLE_ML) / 100;
+            lastWaterLevel.push_back(waterML);
+            if (lastWaterLevel.size() == 10) {
+                int all = lastWaterLevel.front();
+                bool consistent = true;
 
-        lastWaterLevel.push_back(waterML);
-        if(lastWaterLevel.size() == 10){
-            int all = lastWaterLevel.front();
-            for(int m: lastWaterLevel){
-                if(m!=all){
-                    lastWaterLevel.pop_front();
-                    return;
+                for(int m: lastWaterLevel) {
+                    if(m != all) { consistent = false; break; }
                 }
+                if (consistent) {
+                    if (lastStableLevel > all) {
+                        totalDrankML += (lastStableLevel - all);
+                    }
+                    lastStableLevel = all;
+                }
+                lastWaterLevel.pop_front();
             }
-            lastWaterLevel.pop_front();
-            if (lastStableLevel > all) {
-                totalDrankML += (lastStableLevel - all);
-            }
-            lastStableLevel = all;
         }
-       
-            
+    }
 
-        // =====================================================
-        // MENU DRAWING
-        // =====================================================
-        if (currentScreen == WATER_SCREEN) {
-            String text =
-                "Water Level\n"
-                + String(levelPercent) + "% (" + waterML + " ml)\n\n"
-                "Press button to see\n"
-                "Total Drank";
-            screen.print(text);
-        }
-        else {
-            String text =
-                "Total Drank\n"
-                + String(totalDrankML) + " ml\n\n"
-                "Press button to see\n"
-                "Water Level";
-            screen.print(text);
+    // =====================================================
+    // MENU DRAWING
+    // =====================================================
+    static unsigned long lastDraw = 0;
+    if (now - lastDraw > SCREEN_REFRESH_RATE_MS) {
+        lastDraw = now;
+
+        // Check stability first
+        if (!stable && currentScreen == STATE_HOME) {
+            screen.print("Please maintain\nthe bottle stable!");
+            return;
         }
 
-        // Debug output
-        Serial.print("Level: ");
-        Serial.print(levelPercent);
-        Serial.print("%  Drank: ");
-        Serial.print(totalDrankML);
-        Serial.println(" ml");
+        switch (currentScreen) {
+            case STATE_HOME: {
+                String modeName = modes[activeMode].name;
+                int modeGoal = modes[activeMode].dailyGoal;
+                screen.showHome(modeName, modeGoal, totalDrankML, waterML);
+                break;
+            }
+
+            case STATE_SET_REGULAR:
+                screen.showModeMenu(modes[REGULAR].name, modes[REGULAR].dailyGoal);
+                break;
+
+            case STATE_SET_SPORTS:
+                screen.showModeMenu(modes[SPORTS].name, modes[SPORTS].dailyGoal);
+                break;
+        }
     }
 }
