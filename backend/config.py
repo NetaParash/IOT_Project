@@ -1,21 +1,21 @@
-import json
-import os
-from enum import Enum
+# config.py
+from enum import IntEnum
+from pathlib import Path
 
-# Load shared configuration from JSON
-env = os.getenv('ENVIRONMENT', 'dev')
-config_path = os.path.join(os.path.dirname(__file__), f'../{env}.json')
-with open(config_path) as config_file:
-    shared_config_data = json.load(config_file)
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+DATA_DIR.mkdir(exist_ok=True)
 
-
-class CacheKey:
-    def __init__(self, key, expiration):
-        self.key = key
-        self.expiration = expiration
+EVENTS_FILE = DATA_DIR / "bottle_events.jsonl"
+SETTINGS_FILE = DATA_DIR / "settings.json"
 
 
-DAY_IN_SECONDS = 86400
+class BottleMode(IntEnum):
+    NORMAL = 0
+    ECO = 1
+    SPORT = 2
+    DEBUG = 3
 
 
-class CacheKeys(Enum):
+FLASK_HOST = "0.0.0.0"
+FLASK_PORT = 5003

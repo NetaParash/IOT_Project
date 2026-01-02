@@ -1,45 +1,95 @@
-import pickle
-import os
+# bottle.py
+import json
+import time
+from typing import Dict, Any
+from config import EVENTS_FILE, SETTINGS_FILE, BottleMode
 
-PICKLE_PATH = "bottle_state.pkl"
 
-def save_bottle_state(data):
-    with open(PICKLE_PATH, "wb") as f:
-        pickle.dump(data, f)
+# ---------- Events ----------
 
-def load_bottle_state():
-    if not os.path.exists(PICKLE_PATH):
-        return {}
+def save_event(event: Dict[str, Any]) -> None:
+    """
+    Append a bottle event to storage.
+    """
+    with open(EVENTS_FILE, "a") as f:
+        f.write(json.dumps(event) + "\n")
 
-    with open(PICKLE_PATH, "rb") as f:
-        return pickle.load(f)
 
-def handle_bottle_post(data):
-    required_fields = ["water_level_percent", "total_drank_ml"]
+def load_events(limit: int | None = None) -> list[dict]:
+    """
+    Load events from storage.
+    """
+    if not EVENTS_FILE.exists():
+        return []
 
-    for field in required_fields:
-        if field not in data:
-            return None, f"Missing field: {field}"
+    with open(EVENTS_FILE) as f:
+        lines = f.readlines()
 
-    bottle_state = {
-        "water_level_percent": data["water_level_percent"],
-        "total_drank_ml": data["total_drank_ml"],
-        "timestamp": data.get("timestamp")
-    }
+    if limit:
+        lines = lines[-limit:]
 
-    save_bottle_state(bottle_state)
-    return bottle_state, None
+    return [json.loads(line) for line in lines]
 
-def handle_bottle_get():
-    data = load_bottle_state()
 
-    if not data:
+# ---------- Settings ----------
+
+def get_settings() -> dict:
+    if not SETTINGS_FILE.exists():
+        return {"mode": BottleMode.NORMAL}
+
+    with open(SETTINGS_FILE) as f:
+        return json.load(f)
+
+
+def set_settings(mode: int) -> None:
+    if mode not in BottleMode._value2member_map_:
+        raise ValueError("Invalid mode")
+
+    with open(SETTINGS_FILE, "w") as f:
+        json.dump({"mode": mode}, f)
+
+
+# ---------- Dashboard ----------
+
+def build_dashboard() -> dict:
+    events = load_events()
+
+    if not events:
         return {
-            "water_level_percent": 0,
-            "total_drank_ml": 0
+            "today_drank_ml": 0,
+            "current_water_level_ml": 0,
+            "last_update_ts": None,
+            "mode": get_settings()["mode"],
         }
 
+    total_drank = sum(e["amount_drank_ml"] for e in events)
+    last_event = events[-1]
+
     return {
-        "water_level_percent": data.get("water_level_percent", 0),
-        "total_drank_ml": data.get("total_drank_ml", 0)
+        "today_drank_ml": total_drank,
+        "current_water_level_ml": last_event["water_level_ml"],
+        "last_update_ts": last_event["ts"],
+        "mode": get_settings()["mode"],
     }
+
+
+# ---------- Validation ----------
+
+def validate_event(data: dict) -> dict:
+    required = {
+        "ts": int,
+        "amount_drank_ml": int,
+        "water_level_ml": int,
+        "mode": int,
+    }
+
+    for field, field_type in required.items():
+        if field not in data:
+            raise ValueError(f"Missing field: {field}")
+        if not isinstance(data[field], field_type):
+            raise ValueError(f"Invalid type for {field}")
+
+    if data["mode"] not in BottleMode._value2member_map_:
+        raise ValueError("Invalid mode enum")
+
+    return data
