@@ -7,6 +7,7 @@ from bottle import (
     set_settings,
     build_dashboard
 )
+from app_utils import get_water_level
 from config import FLASK_HOST, FLASK_PORT
 
 app = Flask(__name__)
@@ -39,9 +40,9 @@ def bottle_get_settings():
 
 # ---------- App ----------
 
-@app.route("/api/app/dashboard", methods=["GET"])
-def app_get_dashboard():
-    return jsonify(build_dashboard()), 200
+@app.route("/api/app/water-level", methods=["GET"])
+def app_get_water_level():
+    return jsonify(get_water_level()), 200
 
 
 @app.route("/api/app/settings", methods=["POST"])

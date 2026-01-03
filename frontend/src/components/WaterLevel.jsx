@@ -1,10 +1,42 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const BottleLiquidGauge = React.memo( function BottleLiquidGauge({
-                                              width = 200,
-                                              height = 380,
-                                              percent = 0,
-                                          }) {
+const POLL_INTERVAL_MS = 30_000;
+
+const WaterLevel = React.memo(function BottleLevel({
+                                                        width = 200,
+                                                        height = 380,
+                                                    }) {
+    const [percent, setPercent] = useState(0);
+    const lastPercentRef = useRef(0);
+
+    async function fetchWaterLevel() {
+        try {
+            const res = await fetch(
+                "https://iot-project-6i3k.onrender.com/api/app/water-level"
+            );
+            const data = await res.json();
+
+            const nextPercent = Math.floor(
+                (data.water_level_ml / data.capacity_ml) * 100
+            );
+
+            // only update if value actually changed
+            if (nextPercent !== lastPercentRef.current) {
+                lastPercentRef.current = nextPercent;
+                setPercent(nextPercent);
+            }
+        } catch (err) {
+            console.error("Water level fetch failed", err);
+        }
+    }
+
+    useEffect(() => {
+        fetchWaterLevel(); // initial fetch
+        const id = setInterval(fetchWaterLevel, POLL_INTERVAL_MS);
+        return () => clearInterval(id);
+    }, []);
+
+    // ---------- SVG logic ----------
     const clamped = Math.max(0, Math.min(percent, 100));
 
     const neckTop = 10;
@@ -81,7 +113,7 @@ const BottleLiquidGauge = React.memo( function BottleLiquidGauge({
                 fontSize="24"
                 fontWeight="600"
                 letterSpacing="0.5px"
-                fill="#1E3A5F"   // 👈 darker text
+                fill="#1E3A5F"
                 style={{
                     fontFamily:
                         "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif",
@@ -91,4 +123,6 @@ const BottleLiquidGauge = React.memo( function BottleLiquidGauge({
             </text>
         </svg>
     );
-})
+});
+
+export default WaterLevel;

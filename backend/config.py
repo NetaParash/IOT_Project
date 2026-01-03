@@ -8,6 +8,7 @@ DATA_DIR.mkdir(exist_ok=True)
 
 EVENTS_FILE = DATA_DIR / "bottle_events.jsonl"
 SETTINGS_FILE = DATA_DIR / "settings.json"
+BOTTLE_CAPACITY_ML = 500
 
 
 class BottleMode(IntEnum):
