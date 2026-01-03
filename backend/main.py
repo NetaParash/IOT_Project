@@ -1,7 +1,6 @@
 # main.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
 from bottle import (
     save_event,
     validate_event,
@@ -9,7 +8,7 @@ from bottle import (
     set_settings,
     build_dashboard
 )
-from app_utils import get_water_level
+from app_utils import get_water_level, get_today_drink_history
 from config import FLASK_HOST, FLASK_PORT
 
 app = Flask(__name__)
@@ -50,6 +49,10 @@ def bottle_get_settings():
 def app_get_water_level():
     return jsonify(get_water_level()), 200
 
+@app.route("/api/app/drink-amount-graph", methods=["GET"])
+
+def app_get_today_drink_history():
+    return jsonify(get_today_drink_history()), 200
 
 @app.route("/api/app/settings", methods=["POST"])
 def app_set_settings():
