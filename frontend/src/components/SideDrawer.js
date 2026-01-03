@@ -14,7 +14,7 @@ export default function SideDrawer() {
             width: 240,
             boxSizing: 'border-box',
             marginTop: '64px', // Start below the App Bar
-            backgroundColor: 'rgba(73,50,54,0.7)', // Semi-transparent background
+            backgroundColor: 'rgb(164,181,225)', // Semi-transparent background
             backgroundSize: 'cover', // Make the background cover the drawer area
             backgroundPosition: 'center', // Center the background image
             color: 'white', // Adjust text color if needed for contrast

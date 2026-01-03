@@ -63,9 +63,9 @@ export default function MainContent() {
                 }}
                 >
                     <Typography variant="h6" color="text.secondary">
-                        Check my project on{' '}
+                        Check our project on{' '}
                         <Link
-                            href="https://github.com/orzohar1409/football_site"
+                            href="https://github.com/NetaParash/IOT_Project"
                             target="_blank"
                             rel="noopener noreferrer"
                             color="inherit"

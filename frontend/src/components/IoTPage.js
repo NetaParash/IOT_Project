@@ -13,7 +13,6 @@ import {
     Slide
 } from '@mui/material';
 import { Email, LinkedIn, GitHub, Code } from '@mui/icons-material';
-import ProfessionalSummary from "./ProfessionalSummary";
 import DownloadIcon from '@mui/icons-material/Download';
 import config from "../config";
 

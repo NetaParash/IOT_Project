@@ -4,14 +4,10 @@ import SportsIcon from '@mui/icons-material/Sports';
 import GroupsIcon from '@mui/icons-material/Groups';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
-import ResultsPage from './components/ResultsPage';
-import ResumePage from './components/ResumePage';
-import WelcomePage from './components/WelcomePage';
-import VenuesPage from './components/VenuesPage';
-import CalendarPage from './components/CalendarPage';
-import SquadPage from './components/SquadPage';
-import IoTPage from "./components/IoTPage";
 
+import WelcomePage from './components/WelcomePage';
+import IoTPage from "./components/IoTPage";
+import DashboardPage from "./components/DashboardPage";
 export const appPages = [
     {
         name: "Welcome",
@@ -20,34 +16,10 @@ export const appPages = [
         icon: () => <Home />,
     },
     {
-        name: "Results",
-        path: "/results",
-        component: <ResultsPage/>,
+        name: "Dashboard",
+        path: "/dashboard",
+        component: <DashboardPage/>,
         icon: () => <SportsIcon />,
-    },
-    {
-        name:"Venues",
-        path: "/venues",
-        component: <VenuesPage/>,
-        icon: () => <SportsSoccerIcon />,
-    },
-    {
-        name:"Calendar",
-        path: "/calendar",
-        component: <CalendarPage/>,
-        icon: () => <CalendarTodayIcon />,
-    },
-    {
-        name:"Squads",
-        path: "/Squads",
-        component: <SquadPage/>,
-        icon: () => <GroupsIcon />,
-    },
-    {
-        name: "About Or Zohar",
-        path: "/resume",
-        component: <ResumePage/>,
-        icon: () => <AccountCircle />,
     },
     {
         name: "IoT Project",
