@@ -41,7 +41,7 @@ export default function TopAppBar() {
                     >
                         {isDrawerOpen ? <CloseIcon /> : <DehazeOutlinedIcon />}
                     </IconButton>
-                    <Typography variant="h6" sx={{flexGrow: 1}}>
+                    <Typography variant="h3" sx={{flexGrow: 1}}>
                         Smart Bottle - {currentTitle}
                     </Typography>
 

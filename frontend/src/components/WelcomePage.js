@@ -25,8 +25,8 @@ export default function WelcomePage() {
                         textAlign: 'center',
                     }}
                 >
-                    <Typography variant="h4" component="h1" gutterBottom>
-                        Welcome to Smart Bottle main page!
+                    <Typography variant="h1" component="h1" gutterBottom>
+                        Welcome to Smart Bottle!
                     </Typography>
                     <Box
                         component="img"

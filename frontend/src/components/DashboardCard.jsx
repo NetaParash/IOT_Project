@@ -28,18 +28,17 @@ export default function DashboardCard({
                     >
                         <Box>
                             {title && (
-                                <Typography variant="h2" color="text.secondary">
+                                <Typography variant="h1" color="text.secondary">
                                     {title}
                                 </Typography>
                             )}
                             {subtitle && (
-                                <Typography variant="h5" color="text.secondary">
+                                <Typography variant="h3" color="text.secondary">
                                     {subtitle}
                                 </Typography>
                             )}
                         </Box>
 
-                        {action}
                     </Box>
                 )}
 
