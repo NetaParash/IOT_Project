@@ -1,5 +1,7 @@
 # main.py
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 from bottle import (
     save_event,
     validate_event,
@@ -11,6 +13,10 @@ from app_utils import get_water_level
 from config import FLASK_HOST, FLASK_PORT
 
 app = Flask(__name__)
+CORS(
+    app,
+    resources={r"/api/*": {"origins": "*"}},
+)
 
 
 # ---------- Bottle ----------
