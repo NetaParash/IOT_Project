@@ -17,12 +17,8 @@ try {
 }
 
 // Construct additional computed values based on loaded config
-sharedConfig.API_BASE_URL = `${sharedConfig.APP_HOSTNAME}:${sharedConfig.API_PORT}`;
-sharedConfig.API_MAIN_ENDPOINT = `${sharedConfig.API_BASE_URL}/${sharedConfig.API_ENDPOINT}`;
-sharedConfig.API_GET_ALL_LEAGUES = `${sharedConfig.API_MAIN_ENDPOINT}/${sharedConfig.API_LEAGUES_ENDPOINT}`;
-sharedConfig.API_GET_ALL_TEAMS = `${sharedConfig.API_MAIN_ENDPOINT}/${sharedConfig.API_TEAMS_ENDPOINT}`;
-sharedConfig.API_GET_ALL_GAMES = `${sharedConfig.API_MAIN_ENDPOINT}/${sharedConfig.API_GAMES_ENDPOINT}`;
-sharedConfig.API_GET_VENUES = `${sharedConfig.API_MAIN_ENDPOINT}/${sharedConfig.API_VENUES_ENDPOINT}`;
-sharedConfig.API_GET_SQUADS = `${sharedConfig.API_MAIN_ENDPOINT}/${sharedConfig.API_SQUADS_ENDPOINT}`;
+sharedConfig.API_BASE_URL = `http://127.0.0.1:5003`;
+// sharedConfig.API_BASE_URL = `https://iot-project-6i3k.onrender.com/`;
+
 // Export the entire configuration object
 export default sharedConfig;

@@ -1,11 +1,9 @@
 from datetime import datetime, timezone
 from bottle import load_events
-
+from typing import Dict, Any
+from config import BOTTLE_CAPACITY_ML
 
 def get_today_drink_history():
-    """
-    Return drink events from today only.
-    """
     now = datetime.now(timezone.utc)
     today_start = datetime(
         year=now.year,
@@ -16,17 +14,16 @@ def get_today_drink_history():
 
     events = load_events()
 
-    today_events = [
+    chart_points = [
         {
-            "ts": e["ts"],
-            "amount_ml": e["amount_drank_ml"],
+            "x": datetime.fromtimestamp(e["ts"], tz=timezone.utc).isoformat(),
+            "y": e["amount_drank_ml"],
         }
         for e in events
         if e.get("amount_drank_ml", 0) > 0 and e["ts"] >= today_start
     ]
 
-    return today_events
-
+    return chart_points
 
 
 def get_water_level() -> Dict[str, Any]:

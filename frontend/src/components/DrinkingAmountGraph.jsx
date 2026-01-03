@@ -9,19 +9,15 @@ export default function DrinkingAmountGraph() {
         async function fetchTodayHistory() {
             try {
                 const res = await fetch(
-                    "https://iot-project-6i3k.onrender.com/api/app/drink-amount-graph"
+                    "http://localhost:5003/api/app/drink-amount-graph"
                 );
                 const json = await res.json();
 
-                const data = json
-                    .sort((a, b) => a.ts - b.ts)
-                    .map(e => ({
-                        x: new Date(e.ts * 1000),
-                        y: e.amount_ml,
-                    }));
-
-
-                setPoints(data);
+                const parsed = json.map(p => ({
+                    x: new Date(p.x),
+                    y: p.y,
+                }));
+                setPoints(parsed);
             } catch (err) {
                 console.error("Failed to load drink amount graph", err);
             }
@@ -37,23 +33,26 @@ export default function DrinkingAmountGraph() {
     return (
         <Box height={220}>
             <LineChart
+                dataset={points}                 // ✅ REQUIRED
                 series={[
                     {
-                        data: points,
+                        dataKey: "y",           // ✅ cumulative amount
                         label: "Amount drank (ml)",
                         color: "#3A7BD5",
                     },
                 ]}
                 xAxis={[
                     {
+                        dataKey: "x",           // ✅ ISO timestamp
                         scaleType: "time",
-                        dataKey: "x",
                         label: "Time (today)",
                     },
                 ]}
                 yAxis={[
                     {
                         label: "ml",
+                        min: 0,
+                        max: 500,
                     },
                 ]}
                 margin={{ left: 60, right: 20, top: 20, bottom: 40 }}
