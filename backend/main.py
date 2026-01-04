@@ -7,7 +7,7 @@ from bottle import (
     get_settings,
     set_settings,
 )
-from app_utils import get_water_level, get_today_drink_history, get_total_drank_today
+from app_utils import get_water_level, get_today_drink_history, get_total_drank_today, clear_event_data
 from config import FLASK_HOST, FLASK_PORT
 
 app = Flask(__name__)
@@ -86,6 +86,25 @@ def app_total_drank_today():
 @app.route("/api/app/drink-amount-graph", methods=["GET"])
 def app_get_today_drink_history():
     return jsonify(get_today_drink_history()), 200
+
+@app.route("/api/app/clear-event-data", methods=["POST"])
+def delete_event_data():
+    """
+    Delete all bottle event data (used for reset / testing).
+    """
+    try:
+        clear_event_data()
+
+        return jsonify({
+            "status": "ok",
+            "message": "All event data deleted"
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from bottle import load_events
 from typing import Dict, Any
-from config import BOTTLE_CAPACITY_ML
+from config import BOTTLE_CAPACITY_ML, EVENTS_FILE
 
 
 def get_today_drink_history():
@@ -63,3 +63,9 @@ def get_total_drank_today():
     last_event = events[-1]
 
     return last_event["amount_drank_ml"]
+
+# app_utils.py
+
+
+def clear_event_data():
+    open(EVENTS_FILE, "w").close()
