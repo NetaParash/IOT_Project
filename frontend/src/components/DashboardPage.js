@@ -22,6 +22,13 @@ export default function DashboardPage() {
                 >
                 </DashboardCard>
             </Grid>
+            <Grid item size={3}>
+                <DashboardCard
+                    title="My Progress"
+                    subtitle="2000 ml"
+                >
+                </DashboardCard>
+            </Grid>
 
             {/* Drink amount graph */}
             <Grid item size={10}>

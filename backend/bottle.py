@@ -33,20 +33,23 @@ def load_events(limit: int | None = None) -> list[dict]:
 
 # ---------- Settings ----------
 
-def get_settings() -> dict:
-    if not SETTINGS_FILE.exists():
-        return {"mode": BottleMode.NORMAL}
+def set_settings(mode: int, goal: int) -> None:
+    if mode not in BottleMode._value2member_map_:
+        raise ValueError("Invalid mode")
 
-    with open(SETTINGS_FILE) as f:
-        return json.load(f)
+    if not isinstance(goal, int) or goal <= 0:
+        raise ValueError("Invalid goal")
+
+    with open(SETTINGS_FILE, "w") as f:
+        json.dump({"mode": mode, "goal": goal}, f)
 
 
-def set_settings(mode: int) -> None:
+def set_settings(mode: int, goal: int) -> None:
     if mode not in BottleMode._value2member_map_:
         raise ValueError("Invalid mode")
 
     with open(SETTINGS_FILE, "w") as f:
-        json.dump({"mode": mode}, f)
+        json.dump({"mode": mode, "goal": goal}, f)
 
 
 # ---------- Dashboard ----------

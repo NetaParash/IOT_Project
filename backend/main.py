@@ -29,7 +29,6 @@ def bottle_post_event():
     try:
         event = validate_event(data)
         save_event(event)
-        set_settings(event["mode"])
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
@@ -38,7 +37,7 @@ def bottle_post_event():
     return jsonify(response), 200
 
 
-@app.route("/api/bottle/settings", methods=["GET"])
+@app.route("/api/bottle/get-settings", methods=["GET"])
 def bottle_get_settings():
     return jsonify(get_settings()), 200
 
@@ -49,23 +48,31 @@ def bottle_get_settings():
 def app_get_water_level():
     return jsonify(get_water_level()), 200
 
-@app.route("/api/app/drink-amount-graph", methods=["GET"])
 
+@app.route("/api/app/drink-amount-graph", methods=["GET"])
 def app_get_today_drink_history():
     return jsonify(get_today_drink_history()), 200
 
-@app.route("/api/app/settings", methods=["POST"])
+
+@app.route("/api/app/set-settings", methods=["POST"])
 def app_set_settings():
     data = request.get_json()
-    if not data or "mode" not in data:
-        return jsonify({"error": "Missing mode"}), 400
+    if not data or "mode" not in data or "goal" not in data:
+        return jsonify({"error": "Missing mode or goal"}), 400
 
     try:
-        set_settings(data["mode"])
+        set_settings(
+            mode=data["mode"],
+            goal=data["goal"]
+        )
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
     return jsonify({"status": "ok"}), 200
+
+@app.route("/api/app/get-settings", methods=["GET"])
+def app_get_settings():
+    return jsonify(get_settings()), 200
 
 
 if __name__ == "__main__":

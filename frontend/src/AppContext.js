@@ -1,50 +1,89 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    useMemo,
+} from "react";
 
-const AppContext = createContext();
+import config from "./config";
+
+const AppContext = createContext(null);
+
+const SETTINGS_POLL_INTERVAL = 30_000; // 30 seconds
 
 export const AppProvider = ({ children }) => {
-    const [selectedLeague, setSelectedLeague] = useState(null);
-    const [selectedLeagueId, setSelectedLeagueId] = useState(null);
-    const [allLeagues, setAllLeagues] = useState([]);
-    const [selectedTeam, setSelectedTeam] = useState(null);
-    const [selectedTeamId, setSelectedTeamId] = useState(null);
-    const [teams, setTeams] = useState([]);
-    const [games, setGames] = useState([]);
-    const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-    const [selectedGame, setSelectedGame] = useState(null);
-    const [error, setError] = useState(null);
-    const toggleDrawer = () => {
-        setIsDrawerOpen(!isDrawerOpen);
+    // ----- bottle state -----
+    const [currentWaterLevel, setCurrentWaterLevel] = useState(0);
+    const [dailyGoal, setDailyGoal] = useState(1500);
+    const [totalDrankToday, setTotalDrankToday] = useState(0);
+
+    // ----- settings -----
+    const [mode, setMode] = useState(null);
+    const [settingsLoading, setSettingsLoading] = useState(true);
+
+    // ----- fetch settings -----
+    const fetchSettings = async () => {
+        try {
+            const res = await fetch(
+                `${config.API_BASE_URL}/api/bottle/settings`
+            );
+            const data = await res.json();
+
+            if (typeof data.mode === "number") {
+                setMode(data.mode);
+            }
+        } catch (err) {
+            console.error("Failed to fetch settings:", err);
+        } finally {
+            setSettingsLoading(false);
+        }
     };
 
-    const value = useMemo(() => ({
-        selectedLeague, setSelectedLeague,
-        selectedLeagueId, setSelectedLeagueId,
-        selectedTeam, setSelectedTeam,
-        selectedTeamId, setSelectedTeamId,
-        games, setGames,
-        isDrawerOpen, setIsDrawerOpen,
-        selectedGame, setSelectedGame,
-        toggleDrawer,
-        allLeagues, setAllLeagues,
-        teams, setTeams,
-        error, setError
-    }), [
-        selectedLeague, selectedLeagueId, selectedTeam, selectedTeamId, games,
-        isDrawerOpen, selectedGame, allLeagues, teams, error
-    ]);
+    // ----- poll settings every 30s -----
+    useEffect(() => {
+        fetchSettings(); // initial fetch
+
+        const interval = setInterval(fetchSettings, SETTINGS_POLL_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const value = useMemo(
+        () => ({
+            // bottle data
+            currentWaterLevel,
+            setCurrentWaterLevel,
+            dailyGoal,
+            setDailyGoal,
+            totalDrankToday,
+            setTotalDrankToday,
+
+            // settings
+            mode,
+            setMode,
+            settingsLoading,
+        }),
+        [
+            currentWaterLevel,
+            dailyGoal,
+            totalDrankToday,
+            mode,
+            settingsLoading,
+        ]
+    );
 
     return (
         <AppContext.Provider value={value}>
             {children}
         </AppContext.Provider>
     );
-}
+};
 
 export const useAppContext = () => {
     const context = useContext(AppContext);
     if (!context) {
-        throw new Error('useAppContext must be used within an AppProvider');
+        throw new Error("useAppContext must be used within AppProvider");
     }
     return context;
-}
+};
