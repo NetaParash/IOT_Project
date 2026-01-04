@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { CircularProgress, Box } from "@mui/material";
+import config from "../config";
+import { useAppContext } from "../AppContext";
+import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
+
 
 const POLL_INTERVAL_MS = 30_000;
 
 export default function DrinkingAmountGraph() {
     const [points, setPoints] = useState([]);
+    const { goal } = useAppContext();
 
     const fetchTodayHistory = async () => {
         try {
             const res = await fetch(
-                "http://localhost:5003/api/app/drink-amount-graph"
+                `${config.API_BASE_URL}/api/app/drink-amount-graph`
             );
             const json = await res.json();
 
@@ -49,6 +54,8 @@ export default function DrinkingAmountGraph() {
         <Box height={600}>
             <LineChart
                 dataset={points}
+                grid={{ horizontal: true, vertical: true }}
+
                 series={[
                     {
                         dataKey: "y",
@@ -61,17 +68,32 @@ export default function DrinkingAmountGraph() {
                         dataKey: "x",
                         scaleType: "time",
                         label: "Time (today)",
+                        valueFormatter: (ts) =>
+                            new Date(ts).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            }),
                     },
                 ]}
                 yAxis={[
                     {
                         label: "ml",
                         min: 0,
-                        max: 500,
+                        max: goal,
                     },
                 ]}
                 margin={{ left: 60, right: 20, top: 20, bottom: 40 }}
+            >  <ChartsReferenceLine
+                y={goal}
+                label={`Daily Goal: ${goal} ml`}
+                lineStyle={{ stroke: "#4CAF50"}}
+                labelStyle={{
+                    fontSize: 20,
+                    fontWeight: 600,
+
+                }}
             />
+            </LineChart>
         </Box>
     );
 }

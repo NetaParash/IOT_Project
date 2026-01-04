@@ -11,7 +11,7 @@ export default function SideDrawer() {
     const drawerStyles = {
         flexShrink: 0,
         '& .MuiDrawer-paper': {
-            width: 240,
+            width: 280,
             boxSizing: 'border-box',
             marginTop: '64px', // Start below the App Bar
             backgroundColor: 'rgb(164,181,225)', // Semi-transparent background

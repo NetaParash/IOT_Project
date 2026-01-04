@@ -26,8 +26,8 @@ def load_events(limit: int | None = None) -> list[dict]:
 def validate_event(data: dict) -> dict:
     required = {
         "ts": int,
+        "amount_drank_ml":int,
         "water_level_ml": int,
-        "total_drank_today_ml": int,
     }
 
     for field, t in required.items():
