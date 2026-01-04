@@ -1,24 +1,16 @@
 # bottle.py
 import json
-import time
 from typing import Dict, Any
 from config import EVENTS_FILE, SETTINGS_FILE, BottleMode
-
 
 # ---------- Events ----------
 
 def save_event(event: Dict[str, Any]) -> None:
-    """
-    Append a bottle event to storage.
-    """
     with open(EVENTS_FILE, "a") as f:
         f.write(json.dumps(event) + "\n")
 
 
 def load_events(limit: int | None = None) -> list[dict]:
-    """
-    Load events from storage.
-    """
     if not EVENTS_FILE.exists():
         return []
 
@@ -31,68 +23,53 @@ def load_events(limit: int | None = None) -> list[dict]:
     return [json.loads(line) for line in lines]
 
 
+def validate_event(data: dict) -> dict:
+    required = {
+        "ts": int,
+        "water_level_ml": int,
+        "total_drank_today_ml": int,
+    }
+
+    for field, t in required.items():
+        if field not in data or not isinstance(data[field], t):
+            raise ValueError(f"Invalid or missing field: {field}")
+
+    return data
+
+
 # ---------- Settings ----------
 
-def set_settings(mode: int, goal: int) -> None:
+DEFAULT_SETTINGS = {
+    "mode": BottleMode.NORMAL,
+    "goal": 1500,
+    "alerts_every": 30,
+}
+
+
+def get_settings() -> dict:
+    if not SETTINGS_FILE.exists():
+        return DEFAULT_SETTINGS.copy()
+
+    with open(SETTINGS_FILE) as f:
+        return json.load(f)
+
+
+def set_settings(mode: int, goal: int, alerts_every: int) -> None:
     if mode not in BottleMode._value2member_map_:
         raise ValueError("Invalid mode")
 
     if not isinstance(goal, int) or goal <= 0:
         raise ValueError("Invalid goal")
 
-    with open(SETTINGS_FILE, "w") as f:
-        json.dump({"mode": mode, "goal": goal}, f)
-
-
-def set_settings(mode: int, goal: int) -> None:
-    if mode not in BottleMode._value2member_map_:
-        raise ValueError("Invalid mode")
+    if not isinstance(alerts_every, int) or alerts_every <= 0:
+        raise ValueError("Invalid alerts_every")
 
     with open(SETTINGS_FILE, "w") as f:
-        json.dump({"mode": mode, "goal": goal}, f)
-
-
-# ---------- Dashboard ----------
-
-def build_dashboard() -> dict:
-    events = load_events()
-
-    if not events:
-        return {
-            "today_drank_ml": 0,
-            "current_water_level_ml": 0,
-            "last_update_ts": None,
-            "mode": get_settings()["mode"],
-        }
-
-    total_drank = sum(e["amount_drank_ml"] for e in events)
-    last_event = events[-1]
-
-    return {
-        "today_drank_ml": total_drank,
-        "current_water_level_ml": last_event["water_level_ml"],
-        "last_update_ts": last_event["ts"],
-        "mode": get_settings()["mode"],
-    }
-
-
-# ---------- Validation ----------
-
-def validate_event(data: dict) -> dict:
-    required = {
-        "ts": int,
-        "amount_drank_ml": int,
-        "water_level_ml": int,
-        "mode": int,
-    }
-
-    for field, field_type in required.items():
-        if field not in data:
-            raise ValueError(f"Missing field: {field}")
-        if not isinstance(data[field], field_type):
-            raise ValueError(f"Invalid type for {field}")
-
-    if data["mode"] not in BottleMode._value2member_map_:
-        raise ValueError("Invalid mode enum")
-
-    return data
+        json.dump(
+            {
+                "mode": mode,
+                "goal": goal,
+                "alerts_every": alerts_every,
+            },
+            f,
+        )

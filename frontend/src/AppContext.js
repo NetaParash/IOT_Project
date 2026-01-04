@@ -1,76 +1,78 @@
 import React, {
     createContext,
     useContext,
-    useState,
     useEffect,
     useMemo,
+    useState,
 } from "react";
 
 import config from "./config";
 
 const AppContext = createContext(null);
-
-const SETTINGS_POLL_INTERVAL = 30_000; // 30 seconds
+const POLL_INTERVAL_MS = 30_000;
 
 export const AppProvider = ({ children }) => {
-    // ----- bottle state -----
-    const [currentWaterLevel, setCurrentWaterLevel] = useState(0);
-    const [dailyGoal, setDailyGoal] = useState(1500);
-    const [totalDrankToday, setTotalDrankToday] = useState(0);
+    // ---- authoritative state (5 only) ----
+    const [waterLevel, setWaterLevel] = useState(0);
+    const [drankToday, setDrankToday] = useState(0);
 
-    // ----- settings -----
     const [mode, setMode] = useState(null);
-    const [settingsLoading, setSettingsLoading] = useState(true);
+    const [goal, setGoal] = useState(0);
+    const [alertsEvery, setAlertsEvery] = useState(0);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+    const toggleDrawer = () => {
+        setIsDrawerOpen(!isDrawerOpen);
+    };
 
-    // ----- fetch settings -----
-    const fetchSettings = async () => {
+    const pollBackend = async () => {
         try {
-            const res = await fetch(
-                `${config.API_BASE_URL}/api/bottle/settings`
+            // settings
+            const settingsRes = await fetch(
+                `${config.API_BASE_URL}/api/app/settings`
             );
-            const data = await res.json();
+            const settings = await settingsRes.json();
 
-            if (typeof data.mode === "number") {
-                setMode(data.mode);
-            }
+            setMode(settings.mode);
+            setGoal(settings.goal);
+            setAlertsEvery(settings.alerts_every);
+
+            // water level
+            const waterRes = await fetch(
+                `${config.API_BASE_URL}/api/app/water-level`
+            );
+            const water = await waterRes.json();
+
+            setWaterLevel(water.water_level_ml);
+
+            // total drank today
+            const drankRes = await fetch(
+                `${config.API_BASE_URL}/api/app/total-drank-today`
+            );
+            const drank = await drankRes.json();
+
+            setDrankToday(drank.total_drank_today_ml);
         } catch (err) {
-            console.error("Failed to fetch settings:", err);
-        } finally {
-            setSettingsLoading(false);
+            console.error("Polling failed:", err);
         }
     };
 
-    // ----- poll settings every 30s -----
     useEffect(() => {
-        fetchSettings(); // initial fetch
-
-        const interval = setInterval(fetchSettings, SETTINGS_POLL_INTERVAL);
-
+        pollBackend(); // initial
+        const interval = setInterval(pollBackend, POLL_INTERVAL_MS);
         return () => clearInterval(interval);
     }, []);
 
     const value = useMemo(
         () => ({
-            // bottle data
-            currentWaterLevel,
-            setCurrentWaterLevel,
-            dailyGoal,
-            setDailyGoal,
-            totalDrankToday,
-            setTotalDrankToday,
+            waterLevel,
+            drankToday,
+            mode,
+            goal,
+            alertsEvery,         isDrawerOpen, setIsDrawerOpen,
+            toggleDrawer,
 
-            // settings
-            mode,
-            setMode,
-            settingsLoading,
         }),
-        [
-            currentWaterLevel,
-            dailyGoal,
-            totalDrankToday,
-            mode,
-            settingsLoading,
-        ]
+        [waterLevel, drankToday, mode, goal, alertsEvery, isDrawerOpen]
     );
 
     return (
@@ -81,9 +83,9 @@ export const AppProvider = ({ children }) => {
 };
 
 export const useAppContext = () => {
-    const context = useContext(AppContext);
-    if (!context) {
+    const ctx = useContext(AppContext);
+    if (!ctx) {
         throw new Error("useAppContext must be used within AppProvider");
     }
-    return context;
+    return ctx;
 };
