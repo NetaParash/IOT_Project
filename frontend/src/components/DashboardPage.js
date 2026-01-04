@@ -8,30 +8,30 @@ export default function DashboardPage() {
     const { goal, drankToday } = useAppContext();
 
     return (
-        <Grid container spacing={3} p={3}>
+        <Grid container spacing={3}>
             {/* ===== Row 1: 3 cards ===== */}
-            <Grid container item xs={12} spacing={3}>
-                <Grid item xs={12} md={4}>
+                <Grid item size={3}>
                     <DashboardCard title="Water Level" subtitle="Current">
                         <WaterLevel />
                     </DashboardCard>
                 </Grid>
 
-                <Grid item xs={12} md={4}>
-                    <DashboardCard title="Daily Goal" subtitle={`${goal} ml`}>
-                        <Typography variant="h4">{goal} ml</Typography>
+                <Grid item size={3}>
+                    <DashboardCard title="Daily Goal" subtitle="It's important to stay hydrated">
+                        <Typography variant="h1">{goal} ml</Typography>
                     </DashboardCard>
                 </Grid>
 
-                <Grid item xs={12} md={4}>
-                    <DashboardCard title="My Progress" subtitle="Today">
-                        <Typography variant="h4">{drankToday} ml</Typography>
+                <Grid item size={3}>
+                    <DashboardCard title="My Progress" subtitle={`Today drank - ${drankToday} ml`}>
+                        <Typography variant="h1">
+                            {Math.round((drankToday * 100) / goal)} %
+                        </Typography>
                     </DashboardCard>
                 </Grid>
-            </Grid>
 
             {/* ===== Row 2: Graph ===== */}
-            <Grid item xs={12}>
+            <Grid item size={9}>
                 <DashboardCard title="Drinking Amount" subtitle="Today">
                     <DrinkingAmountGraph />
                 </DashboardCard>
