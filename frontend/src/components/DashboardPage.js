@@ -7,7 +7,7 @@ export default function DashboardPage() {
     return (
         <Grid container spacing={3} p={3}>
             {/* Bottle */}
-            <Grid item xs={12} md={4}>
+            <Grid item size={3}>
                 <DashboardCard
                     title="Water Level"
                     subtitle="Current"
@@ -15,9 +15,16 @@ export default function DashboardPage() {
                     <WaterLevel />
                 </DashboardCard>
             </Grid>
+            <Grid item size={3}>
+                <DashboardCard
+                    title="Daily Goal"
+                    subtitle="2000 ml"
+                >
+                </DashboardCard>
+            </Grid>
 
             {/* Drink amount graph */}
-            <Grid item xs={12} md={8}>
+            <Grid item size={10}>
                 <DashboardCard
                     title="Drinking Amount"
                     subtitle="Today"

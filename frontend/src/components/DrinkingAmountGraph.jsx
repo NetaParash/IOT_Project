@@ -31,7 +31,7 @@ export default function DrinkingAmountGraph() {
     }
 
     return (
-        <Box height={220}>
+        <Box height={600}>
             <LineChart
                 dataset={points}                 // ✅ REQUIRED
                 series={[
