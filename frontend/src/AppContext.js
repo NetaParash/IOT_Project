@@ -66,14 +66,21 @@ export const AppProvider = ({ children }) => {
         () => ({
             waterLevel,
             drankToday,
+
             mode,
             goal,
-            alertsEvery,         isDrawerOpen, setIsDrawerOpen,
-            toggleDrawer,
+            alertsEvery,
 
+            setMode,
+            setGoal,
+            setAlertsEvery,
+
+            isDrawerOpen,
+            toggleDrawer,
         }),
         [waterLevel, drankToday, mode, goal, alertsEvery, isDrawerOpen]
     );
+
 
     return (
         <AppContext.Provider value={value}>

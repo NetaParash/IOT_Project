@@ -7,6 +7,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 import WelcomePage from './components/WelcomePage';
 import DashboardPage from "./components/DashboardPage";
+import SettingsPage from "./components/SettingsPage";
 export const appPages = [
     {
         name: "Welcome",
@@ -18,6 +19,12 @@ export const appPages = [
         name: "Dashboard",
         path: "/dashboard",
         component: <DashboardPage/>,
+        icon: () => <SportsIcon />,
+    },
+    {
+        name: "Settings",
+        path: "/settings",
+        component: <SettingsPage/>,
         icon: () => <SportsIcon />,
     }
 ];

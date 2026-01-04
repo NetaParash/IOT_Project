@@ -59,8 +59,8 @@ export default function SideDrawer() {
                             >
                                 <ListItemIcon aria-hidden="true">{page.icon()}</ListItemIcon>
                                 <ListItemText primary={page.name} primaryTypographyProps={{
-                                    variant: "h3",
-                                    fontWeight: 600,
+                                    variant: "h1",
+                                    fontWeight: 300,
                                 }}/>
                             </ListItem>
                             {index < appPages.length - 1 && (

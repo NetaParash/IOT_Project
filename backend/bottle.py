@@ -1,7 +1,13 @@
 # bottle.py
 import json
 from typing import Dict, Any
-from config import EVENTS_FILE, SETTINGS_FILE, BottleMode
+
+from config import (
+    EVENTS_FILE,
+    SETTINGS_FILE,
+    VALID_MODES,
+    DEFAULT_MODE,
+)
 
 # ---------- Events ----------
 
@@ -26,7 +32,7 @@ def load_events(limit: int | None = None) -> list[dict]:
 def validate_event(data: dict) -> dict:
     required = {
         "ts": int,
-        "amount_drank_ml":int,
+        "amount_drank_ml": int,
         "water_level_ml": int,
     }
 
@@ -40,9 +46,9 @@ def validate_event(data: dict) -> dict:
 # ---------- Settings ----------
 
 DEFAULT_SETTINGS = {
-    "mode": BottleMode.NORMAL,
-    "goal": 1500,
-    "alerts_every": 30,
+    "mode": DEFAULT_MODE,
+    "goal": 2500,
+    "alerts_every": 60,
 }
 
 
@@ -54,14 +60,15 @@ def get_settings() -> dict:
         return json.load(f)
 
 
-def set_settings(mode: int, goal: int, alerts_every: int) -> None:
-    if mode not in BottleMode._value2member_map_:
+def set_settings(mode: str, goal: int, alerts_every: int) -> None:
+    if mode not in VALID_MODES:
         raise ValueError("Invalid mode")
 
     if not isinstance(goal, int) or goal <= 0:
         raise ValueError("Invalid goal")
 
-    if not isinstance(alerts_every, int) or alerts_every <= 0:
+    # IMPORTANT: allow 0 (night mode)
+    if not isinstance(alerts_every, int) or alerts_every < 0:
         raise ValueError("Invalid alerts_every")
 
     with open(SETTINGS_FILE, "w") as f:
