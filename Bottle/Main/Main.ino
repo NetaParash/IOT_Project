@@ -7,29 +7,33 @@
 
 using namespace std;
 
-
 // ========================
 // MODES
 // ========================
-enum BottleMode { 
-    REGULAR, 
-    SPORTS 
+enum BottleMode {
+    HYDRATION,
+    SPORT,
+    OFFICE,
+    NIGHT,
+    MODE_COUNT // Helper to know how many modes exist
 };
 
 struct ModeConfig {
-    String name;     
-    int dailyGoal;   
+    String name;
+    int dailyGoal;
     // TODO: Add time delta for notifications
 };
 
-static const ModeConfig modes[] = {
-    // Name      // Goal (mL)
-    { "Regular", 2000 },  // Index matches REGULAR
-    { "Sports",  3000 }   // Index matches SPORTS
+// Modes Configuration
+static const ModeConfig modes[MODE_COUNT] = {
+        { "Hydration", 2500 }, // Index 0
+        { "Sport",     3500 }, // Index 1
+        { "Office",    2000 }, // Index 2
+        { "Night",     500  }  // Index 3
 };
 
 // ========================
-// WATER LEVEL PINS (Bottom → Top)
+// WATER LEVEL PINS (Bottom -> Top)
 // ========================
 WaterLevelSensor waterLevelSensor({14, 27, 33, 32});
 
@@ -61,12 +65,12 @@ const unsigned long SCREEN_REFRESH_RATE_MS = 100;
 // ========================
 enum MenuState {
     STATE_HOME,
-    STATE_SET_REGULAR,
-    STATE_SET_SPORTS
+    STATE_SELECT_MODE // Generic state for browsing any mode
 };
 
 MenuState currentScreen = STATE_HOME;
-BottleMode activeMode = REGULAR;
+BottleMode activeMode = HYDRATION;
+int browsingModeIndex = 0; // Index to track which mode we are currently looking at in the menu
 
 // ========================
 // DRINK TRACKING
@@ -81,7 +85,7 @@ void setup() {
     Serial.begin(115200);
     delay(500);
 
-    Wire.begin(21, 22); // SHARED I2C FOR SCREEN + MPU6050
+    Wire.begin(21, 22);
 
     screen.setup();
     screen.print("Initializing...");
@@ -98,7 +102,7 @@ void loop() {
     unsigned long now = millis();
 
     // =====================================================
-    // UPDATE BUTTONS (required for wasPressed)
+    // UPDATE BUTTONS
     // =====================================================
     btnSelect.update();   
     btnNext.update();
@@ -110,29 +114,27 @@ void loop() {
         // --- HOME SCREEN ---
         case STATE_HOME:
             if (btnNext.wasPressed()) {
-                currentScreen = STATE_SET_REGULAR;
+                // Start browsing from the first mode in the list
+                currentScreen = STATE_SELECT_MODE;
+                browsingModeIndex = 0;
             }
             break;
 
-        // --- SELECT REGULAR MODE ---
-        case STATE_SET_REGULAR:
+            // --- MODE SELECTION MENU ---
+        case STATE_SELECT_MODE:
             if (btnSelect.wasPressed()) {
-                activeMode = REGULAR; 
+                // Confirm selection
+                activeMode = (BottleMode)browsingModeIndex;
                 currentScreen = STATE_HOME;
-            } 
-            else if (btnNext.wasPressed()) {
-                currentScreen = STATE_SET_SPORTS;
             }
-            break;
+            else if (btnNext.wasPressed()) {
+                // Move to next mode in the list
+                browsingModeIndex++;
 
-        // --- SELECT SPORTS MODE ---
-        case STATE_SET_SPORTS:
-            if (btnSelect.wasPressed()) {
-                activeMode = SPORTS; 
-                currentScreen = STATE_HOME;
-            }
-            else if (btnNext.wasPressed()) {
-                currentScreen = STATE_HOME;
+                // If we passed the last mode, go back to Home
+                if (browsingModeIndex >= MODE_COUNT) {
+                    currentScreen = STATE_HOME;
+                }
             }
             break;
     }
@@ -192,13 +194,13 @@ void loop() {
                 break;
             }
 
-            case STATE_SET_REGULAR:
-                screen.showModeMenu(modes[REGULAR].name, modes[REGULAR].dailyGoal);
+            case STATE_SELECT_MODE: {
+                // Show the mode we are currently BROWSING
+                String modeName = modes[browsingModeIndex].name;
+                int modeGoal = modes[browsingModeIndex].dailyGoal;
+                screen.showModeMenu(modeName, modeGoal);
                 break;
-
-            case STATE_SET_SPORTS:
-                screen.showModeMenu(modes[SPORTS].name, modes[SPORTS].dailyGoal);
-                break;
+            }
         }
     }
 }
