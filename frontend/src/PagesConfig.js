@@ -1,8 +1,7 @@
 import { Home, AccountCircle } from '@mui/icons-material';
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import SportsIcon from '@mui/icons-material/Sports';
-import GroupsIcon from '@mui/icons-material/Groups';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import SettingsIcon from '@mui/icons-material/Settings';import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 
 import WelcomePage from './components/WelcomePage';
@@ -19,12 +18,12 @@ export const appPages = [
         name: "Dashboard",
         path: "/dashboard",
         component: <DashboardPage/>,
-        icon: () => <SportsIcon />,
+        icon: () => <DashboardIcon />,
     },
     {
         name: "Settings",
         path: "/settings",
         component: <SettingsPage/>,
-        icon: () => <SportsIcon />,
+        icon: () => <SettingsIcon />,
     }
 ];

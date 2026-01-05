@@ -57,7 +57,7 @@ export default function SideDrawer() {
                                     color: isSelected ? 'yellow' : 'white', // Change text color for selected page
                                 }}
                             >
-                                <ListItemIcon aria-hidden="true">{page.icon()}</ListItemIcon>
+                                <ListItemIcon aria-hidden="true" >{page.icon()}</ListItemIcon>
                                 <ListItemText primary={page.name} primaryTypographyProps={{
                                     variant: "h1",
                                     fontWeight: 300,
