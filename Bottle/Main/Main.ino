@@ -50,15 +50,15 @@ GyroSensor gyro(21, 22);
 // ========================
 // BUTTONS
 // ========================
-Button btnNext(5);
-Button btnSelect(4); 
+Button btnNext(4);
+Button btnSelect(5);
 
 // ========================
 // TIMING
 // ========================
 unsigned long lastWaterCheck = 0;
 const unsigned long WATER_INTERVAL_MS = 100;
-const unsigned long SCREEN_REFRESH_RATE_MS = 100;
+const unsigned long SCREEN_REFRESH_RATE_MS = 150;
 
 // ========================
 // MENU STATE
@@ -104,7 +104,7 @@ void loop() {
     // =====================================================
     // UPDATE BUTTONS
     // =====================================================
-    btnSelect.update();   
+    btnSelect.update();
     btnNext.update();
 
     // =====================================================
@@ -113,6 +113,9 @@ void loop() {
     switch (currentScreen) {
         // --- HOME SCREEN ---
         case STATE_HOME:
+            // If Select button was pressed in HOME screen, we "consume" the press to clear the memory
+            btnSelect.wasPressed();
+
             if (btnNext.wasPressed()) {
                 // Start browsing from the first mode in the list
                 currentScreen = STATE_SELECT_MODE;
@@ -183,23 +186,23 @@ void loop() {
         // Check stability first
         if (!stable && currentScreen == STATE_HOME) {
             screen.print("Please maintain\nthe bottle stable!");
-            return;
         }
+        else {
+            switch (currentScreen) {
+                case STATE_HOME: {
+                    String modeName = modes[activeMode].name;
+                    int modeGoal = modes[activeMode].dailyGoal;
+                    screen.showHome(modeName, modeGoal, totalDrankML, waterML);
+                    break;
+                }
 
-        switch (currentScreen) {
-            case STATE_HOME: {
-                String modeName = modes[activeMode].name;
-                int modeGoal = modes[activeMode].dailyGoal;
-                screen.showHome(modeName, modeGoal, totalDrankML, waterML);
-                break;
-            }
-
-            case STATE_SELECT_MODE: {
-                // Show the mode we are currently BROWSING
-                String modeName = modes[browsingModeIndex].name;
-                int modeGoal = modes[browsingModeIndex].dailyGoal;
-                screen.showModeMenu(modeName, modeGoal);
-                break;
+                case STATE_SELECT_MODE: {
+                    // Show the mode we are currently BROWSING
+                    String modeName = modes[browsingModeIndex].name;
+                    int modeGoal = modes[browsingModeIndex].dailyGoal;
+                    screen.showModeMenu(modeName, modeGoal);
+                    break;
+                }
             }
         }
     }
