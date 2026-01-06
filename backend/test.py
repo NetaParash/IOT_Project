@@ -1,9 +1,10 @@
 import requests
 from config import config
 import json
+
 url = "https://v3.football.api-sports.io/venues?search=England"
 
-payload={}
+payload = {}
 headers = config.API_REQUEST_HEADERS
 
 response = requests.request("GET", url, headers=headers, data=payload)
