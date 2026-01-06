@@ -1,69 +1,73 @@
 #include <Arduino.h>
 #include <vector>
-#include <driver/touch_pad.h> // REQUIRED for the hardware filter
+#include <driver/touch_pad.h>
 
 // ==========================================
-// CONFIGURATION
+// CALIBRATION (Based on your CSV)
 // ==========================================
 
-// Threshold: The tipping point (calibrated for your current setup)
-const int TOUCH_THRESHOLD = 50; 
+// 1. WET vs DRY
+// When reading drops below this, we consider the pad "Active"
+const int THRESH_WET_START = 720;
+const int THRESH_WET_STOP  = 750; // Must rise above this to be "Dry" again
 
-// Hysteresis: The "Buffer Zone"
-// Prevents flickering. Valid reading must go below 48 to be "Wet" 
-// and rise above 52 to be "Dry".
-const int HYSTERESIS = 2; 
+// 2. LOW HALF vs HIGH HALF
+// When reading drops below this, we are in the "Top Half" of the pad
+const int THRESH_MID_START = 590;
+const int THRESH_MID_STOP  = 640; // Must rise above this to go back to "Low Half"
 
+// ==========================================
+// CLASS: WaterProbe
+// ==========================================
 class WaterProbe {
 private:
     uint8_t _pin;
-    touch_pad_t _touchPadIndex; // Internal ESP32 touch channel ID
-    int _threshold;
-    int _levelIndex;
-    bool _currentState; // Tracks if we are currently Wet or Dry
+    touch_pad_t _touchPadIndex;
+
+    // Internal States
+    bool _isWet;       // Is water touching this pad?
+    bool _isTopHalf;   // Is water in the upper 50% of this pad?
 
 public:
-    WaterProbe(uint8_t pin, int threshold, int levelIndex) 
-        : _pin(pin), _threshold(threshold), _levelIndex(levelIndex), _currentState(false) {
-        
-        // Convert the GPIO number (e.g., 4) to the Touch Pad Index (e.g., T0)
-        // This is required for the low-level filtered reading function
+    WaterProbe(uint8_t pin)
+            : _pin(pin), _isWet(false), _isTopHalf(false) {
         _touchPadIndex = (touch_pad_t) digitalPinToTouchChannel(pin);
     }
 
     void setup() {
-        // This command physically connects the internal sensor to the pin.
-        // Without this, the reading will always be 0.
         touch_pad_config(_touchPadIndex, 0);
     }
 
-    // UPDATED: Now uses Hysteresis and Filtered Data
-    bool isWet() {
-        uint16_t filteredValue;
-        
-        // Read the SMOOTHED hardware value, not the raw instantaneous one
-        touch_pad_read_filtered(_touchPadIndex, &filteredValue);
-
-        // Hysteresis Logic:
-        // If currently DRY, we need to drop significantly (below Threshold - Hysteresis) to become WET
-        if (!_currentState && filteredValue < (_threshold - HYSTERESIS)) {
-            _currentState = true;
-        }
-        // If currently WET, we need to rise significantly (above Threshold + Hysteresis) to become DRY
-        else if (_currentState && filteredValue > (_threshold + HYSTERESIS)) {
-            _currentState = false;
-        }
-        
-        return _currentState;
-    }
-
-    int getLevelIndex() { return _levelIndex; }
-    
-    // Debug: Return the filtered value so you can calibrate easier
-    int getRawReading() { 
+    // Updates the internal state based on latest reading
+    void update() {
         uint16_t val;
         touch_pad_read_filtered(_touchPadIndex, &val);
-        return val; 
+
+        // --- LOGIC 1: Detect Wet/Dry ---
+        if (!_isWet && val < THRESH_WET_START) {
+            _isWet = true;
+        } else if (_isWet && val > THRESH_WET_STOP) {
+            _isWet = false;
+            _isTopHalf = false; // Reset half state if dry
+        }
+
+        // --- LOGIC 2: Detect Half (Only if Wet) ---
+        if (_isWet) {
+            if (!_isTopHalf && val < THRESH_MID_START) {
+                _isTopHalf = true;
+            } else if (_isTopHalf && val > THRESH_MID_STOP) {
+                _isTopHalf = false;
+            }
+        }
+    }
+
+    bool isWet() { return _isWet; }
+    bool isTopHalf() { return _isTopHalf; }
+
+    int getRawReading() {
+        uint16_t val;
+        touch_pad_read_filtered(_touchPadIndex, &val);
+        return val;
     }
 };
 
@@ -76,63 +80,83 @@ private:
 
 public:
     WaterLevelSensor(std::vector<int> pins) {
-        for (int i=0; i < pins.size(); i++) {
-            _probes.push_back(WaterProbe(pins[i], TOUCH_THRESHOLD, i+1));
+        for (int pin : pins) {
+            _probes.push_back(WaterProbe(pin));
         }
     }
 
     void setup() {
-        // 1. INITIALIZE TOUCH HARDWARE
         touch_pad_init();
-        
-        // 2. SET VOLTAGE (Optional but recommended for stability)
-        // High Ref 2.7V, Low Ref 0.5V, Atten 1V (Standard ESP32 default)
+        // High Ref 2.7V gives the wide range (800-500) you observed
         touch_pad_set_voltage(TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
+        touch_pad_filter_start(10);
 
-        // 3. CONFIGURE FILTER (The magic setting)
-        // Period 10ms. This creates a moving average in hardware.
-        // It kills the "5 unit" noise.
-        touch_pad_filter_start(10); 
-        
-        // 4. SETUP PROBES
         for (auto& probe : _probes) {
             probe.setup();
         }
-        Serial.println("System Initialized.");
+        Serial.println("System Initialized (Split-Pad Logic).");
     }
 
     int getWaterLevel() {
-        int foundLevel = 0;
-        
+        // 1. Update all probes first
+        for (auto& probe : _probes) {
+            probe.update();
+        }
+
+        // 2. Find the Highest Wet Probe
+        int activeProbeIndex = -1;
         for (int i = 0; i < _probes.size(); i++) {
-            if (!_probes[i].isWet()) {
+            if (_probes[i].isWet()) {
+                activeProbeIndex = i;
+            } else {
+                // If this probe is dry, we assume water hasn't reached here.
+                // We stop checking higher probes (assuming gravity works).
                 break;
             }
-            foundLevel = _probes[i].getLevelIndex();
         }
-        
-        printStatus(foundLevel);
-        return (foundLevel * 100) / _probes.size();
+
+        // 3. Calculate Score
+        // 0 = Empty
+        // Each full probe below active = 2 points
+        // Active probe contributes 1 (Low Half) or 2 (High Half)
+
+        int score = 0;
+
+        if (activeProbeIndex == -1) {
+            score = 0; // Completely Empty
+        } else {
+            // Add 2 points for every fully submerged probe below the active one
+            score += (activeProbeIndex * 2);
+
+            // Add points for the active probe itself
+            if (_probes[activeProbeIndex].isTopHalf()) {
+                score += 2; // Top half logic
+            } else {
+                score += 1; // Bottom half logic
+            }
+        }
+
+        // Total max score = (NumProbes * 2)
+        // e.g., 4 probes = Max Score 8.
+        return calculatePercentage(score);
     }
 
-    void printStatus(int level) {
-        if (level == 0) {
-            Serial.println("Level: EMPTY (0%)");
-        } else {
-            float percentage = (float(level) / _probes.size()) * 100.0;
-            Serial.print("Level: ");
-            Serial.print(level);
-            Serial.print(" (");
-            Serial.print(percentage, 1);
-            Serial.println("%)");
-        }
+    int calculatePercentage(int score) {
+        int maxScore = _probes.size() * 2;
+        int percent = (score * 100) / maxScore;
+
+        Serial.print("Score: "); Serial.print(score);
+        Serial.print("/"); Serial.print(maxScore);
+        Serial.print(" -> "); Serial.print(percent); Serial.println("%");
+
+        return percent;
     }
-    
+
     void debugRaw() {
-         for (auto& probe : _probes) {
+        for (auto& probe : _probes) {
             Serial.print(probe.getRawReading());
-            Serial.print("\t"); // Tab for easier reading in Serial Plotter
-         }
-         Serial.println();
+            Serial.print("\t");
+        }
+        Serial.println();
     }
 };
