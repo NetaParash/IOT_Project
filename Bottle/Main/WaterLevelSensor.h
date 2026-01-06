@@ -1,40 +1,70 @@
-/*
- * - Water levels are scanned from Bottom (Level 1) to Top (Level 4).
- * * * WATER SENSORS (Top to Bottom):
- * L4: GPIO 12  |  L3: GPIO 13  |  L2: GPIO 15  |  L1: GPIO 4
- */
-
 #include <Arduino.h>
-#include "GyroSensor.h"
 #include <vector>
+#include <driver/touch_pad.h> // REQUIRED for the hardware filter
 
 // ==========================================
 // CONFIGURATION
 // ==========================================
 
-// Sensitivity for water (Lower value = less sensitive)
+// Threshold: The tipping point (calibrated for your current setup)
 const int TOUCH_THRESHOLD = 50; 
+
+// Hysteresis: The "Buffer Zone"
+// Prevents flickering. Valid reading must go below 48 to be "Wet" 
+// and rise above 52 to be "Dry".
+const int HYSTERESIS = 2; 
 
 class WaterProbe {
 private:
     uint8_t _pin;
+    touch_pad_t _touchPadIndex; // Internal ESP32 touch channel ID
     int _threshold;
     int _levelIndex;
+    bool _currentState; // Tracks if we are currently Wet or Dry
 
 public:
     WaterProbe(uint8_t pin, int threshold, int levelIndex) 
-        : _pin(pin), _threshold(threshold), _levelIndex(levelIndex) {}
-
-    void setup() {
-        // No setup for touch pin
+        : _pin(pin), _threshold(threshold), _levelIndex(levelIndex), _currentState(false) {
+        
+        // Convert the GPIO number (e.g., 4) to the Touch Pad Index (e.g., T0)
+        // This is required for the low-level filtered reading function
+        _touchPadIndex = (touch_pad_t) digitalPinToTouchChannel(pin);
     }
 
+    void setup() {
+        // This command physically connects the internal sensor to the pin.
+        // Without this, the reading will always be 0.
+        touch_pad_config(_touchPadIndex, 0);
+    }
+
+    // UPDATED: Now uses Hysteresis and Filtered Data
     bool isWet() {
-        return touchRead(_pin) < _threshold;
+        uint16_t filteredValue;
+        
+        // Read the SMOOTHED hardware value, not the raw instantaneous one
+        touch_pad_read_filtered(_touchPadIndex, &filteredValue);
+
+        // Hysteresis Logic:
+        // If currently DRY, we need to drop significantly (below Threshold - Hysteresis) to become WET
+        if (!_currentState && filteredValue < (_threshold - HYSTERESIS)) {
+            _currentState = true;
+        }
+        // If currently WET, we need to rise significantly (above Threshold + Hysteresis) to become DRY
+        else if (_currentState && filteredValue > (_threshold + HYSTERESIS)) {
+            _currentState = false;
+        }
+        
+        return _currentState;
     }
 
     int getLevelIndex() { return _levelIndex; }
-    int getRawReading() { return touchRead(_pin); }
+    
+    // Debug: Return the filtered value so you can calibrate easier
+    int getRawReading() { 
+        uint16_t val;
+        touch_pad_read_filtered(_touchPadIndex, &val);
+        return val; 
+    }
 };
 
 // ==========================================
@@ -52,6 +82,19 @@ public:
     }
 
     void setup() {
+        // 1. INITIALIZE TOUCH HARDWARE
+        touch_pad_init();
+        
+        // 2. SET VOLTAGE (Optional but recommended for stability)
+        // High Ref 2.7V, Low Ref 0.5V, Atten 1V (Standard ESP32 default)
+        touch_pad_set_voltage(TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
+
+        // 3. CONFIGURE FILTER (The magic setting)
+        // Period 10ms. This creates a moving average in hardware.
+        // It kills the "5 unit" noise.
+        touch_pad_filter_start(10); 
+        
+        // 4. SETUP PROBES
         for (auto& probe : _probes) {
             probe.setup();
         }
@@ -85,31 +128,11 @@ public:
         }
     }
     
-    // Debug tool
     void debugRaw() {
          for (auto& probe : _probes) {
             Serial.print(probe.getRawReading());
-            Serial.print(" ");
+            Serial.print("\t"); // Tab for easier reading in Serial Plotter
          }
          Serial.println();
     }
 };
-
-// ==========================================
-// MAIN SETUP
-// ==========================================
-
-// WaterLevelSensor waterLevelSensor({15});
-
-// void setup() {
-//   Serial.begin(115200);
-//   delay(1000);
-
-//   waterLevelSensor.setup();
-// }
-
-// void loop() {
-//   waterLevelSensor.getWaterLevel();
-//   waterLevelSensor.debugRaw();
-//   delay(1000);
-// }
