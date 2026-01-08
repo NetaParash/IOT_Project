@@ -27,3 +27,26 @@ void Screen::print(String text) {
     display.println(text);
     display.display();
 }
+
+void Screen::showHome(String modeName, int dailyGoal, int totalDrank, int currentLevel) {
+    int goalPercent = 0;
+    if (dailyGoal > 0) {
+        goalPercent = (totalDrank * 100) / dailyGoal;
+    }
+
+    String text = "Mode: " + modeName + "\n";
+    text += "Goal: " + String(dailyGoal) + " mL\n";
+    text += "Reached: " + String(goalPercent) + "% (" + String(totalDrank) + ")\n";
+    text += "---------------------\n";
+    text += "Level: " + String(currentLevel) + " mL";
+
+    print(text);
+}
+
+void Screen::showModeMenu(String modeName, int dailyGoal) {
+    String text = "Press Select to set:\n";
+    text += modeName + " Mode\n";
+    text += "(" + String(dailyGoal / 1000.0, 1) + " Liters)";
+    
+    print(text);
+}
