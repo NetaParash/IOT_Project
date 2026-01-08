@@ -8,13 +8,12 @@
 
 // 1. WET vs DRY
 // When reading drops below this, we consider the pad "Active"
-const int THRESH_WET_START = 720;
-const int THRESH_WET_STOP  = 750; // Must rise above this to be "Dry" again
+const int THRESH_WET = 680;
 
 // 2. LOW HALF vs HIGH HALF
 // When reading drops below this, we are in the "Top Half" of the pad
-const int THRESH_MID_START = 590;
-const int THRESH_MID_STOP  = 640; // Must rise above this to go back to "Low Half"
+const int THRESH_MID_START = 600;
+const int THRESH_MID_STOP  = 630; // Must rise above this to go back to "Low Half"
 
 // ==========================================
 // CLASS: WaterProbe
@@ -44,9 +43,9 @@ public:
         touch_pad_read_filtered(_touchPadIndex, &val);
 
         // --- LOGIC 1: Detect Wet/Dry ---
-        if (!_isWet && val < THRESH_WET_START) {
+        if (!_isWet && val < THRESH_WET) {
             _isWet = true;
-        } else if (_isWet && val > THRESH_WET_STOP) {
+        } else if (_isWet && val > THRESH_WET) {
             _isWet = false;
             _isTopHalf = false; // Reset half state if dry
         }

@@ -61,6 +61,7 @@ void setup() {
 }
 
 void loop() {
-  waterLevelSensor.debugRaw();
-  delay(1000);
+    waterLevelSensor.getWaterLevel();
+    waterLevelSensor.debugRaw();
+    delay(1000);
 }
