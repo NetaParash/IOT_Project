@@ -24,21 +24,21 @@
  struct ModeConfig {
      String name;
      int dailyGoal;
-     int notificationIntervalMinutes;
+     int alertsEveryMinutes;
  };
 
  // Modes Configuration
  static const ModeConfig modes[MODE_COUNT] = {
-         { "Hydration", 2500, 5 }, // Index 0
-         { "Sport",     3500, 1 }, // Index 1
-         { "Office",    2000, 90 }, // Index 2
-         { "Night",     500,  0  }  // Index 3
+         { "hydration", 2500, 5 }, // Index 0
+         { "sport",     3500, 1 }, // Index 1
+         { "office",    2000, 90 }, // Index 2
+         { "night",     500,  0  }  // Index 3
  };
 
 
 AppClient appClient(
-    "OrZ iPhone",
-    "g0iibm9ik7ry",
+    "Pura Vida", //"OrZ iPhone",
+    "L&Y26100612", //"g0iibm9ik7ry",
     "https://iot-project-6i3k.onrender.com"
 );
 
@@ -88,8 +88,12 @@ unsigned long lastSettingsPullMs = 0;
  };
 
  MenuState currentScreen = STATE_HOME;
- BottleMode activeMode = HYDRATION;
  int browsingModeIndex = 0; // Index to track which mode we are currently looking at in the menu
+
+ // Initialize with mode HYDRATION
+ String activeModeName = modes[HYDRATION].name;
+ int goal = modes[HYDRATION].dailyGoal;
+ int alertsEvery = modes[HYDRATION].alertsEveryMinutes;
 
  // ========================
  // DRINK TRACKING
@@ -141,13 +145,13 @@ unsigned long lastSettingsPullMs = 0;
         auto settings = appClient.getSettings();
 
         if (settings.size() == 3) {
-            String mode = settings[0];
-            int goal = settings[1].toInt();
-            int alertsEvery = settings[2].toInt();
+            activeModeName = settings[0];
+            goal = settings[1].toInt();
+            alertsEvery = settings[2].toInt();
 
             Serial.println("[MAIN] Settings updated:");
             Serial.print("  mode: ");
-            Serial.println(mode);
+            Serial.println(activeModeName);
             Serial.print("  goal: ");
             Serial.println(goal);
             Serial.print("  alerts_every: ");
@@ -177,9 +181,15 @@ unsigned long lastSettingsPullMs = 0;
              // --- MODE SELECTION MENU ---
          case STATE_SELECT_MODE:
              if (btnSelect.wasPressed()) {
-                 // Confirm selection
-                 activeMode = (BottleMode)browsingModeIndex;
+                 // Update mode, goal and alert interval
+                 int idx = (BottleMode)browsingModeIndex;
+                 activeModeName = modes[idx].name;
+                 goal = modes[idx].dailyGoal;
+                 alertsEvery = modes[idx].alertsEveryMinutes;
                  currentScreen = STATE_HOME;
+
+                 // Send new setting to the application
+                 appClient.sendSettings(activeModeName, goal, alertsEvery);
 
                  // Reset the notifications timer on mode change
                  lastNotificationTime = now;
@@ -196,10 +206,9 @@ unsigned long lastSettingsPullMs = 0;
      // =====================================================
      // NOTIFICATION
      // =====================================================
-     int intervalMins = modes[activeMode].notificationIntervalMinutes;
 
-     if (intervalMins > 0) {
-         unsigned long intervalMs = (unsigned long)intervalMins * 60 * 1000;
+     if (alertsEvery > 0) {
+         unsigned long intervalMs = (unsigned long)alertsEvery * 60 * 1000;
          if (now - lastNotificationTime >= intervalMs) {
              // Notify
              lights.blinkNotification();
@@ -257,16 +266,14 @@ unsigned long lastSettingsPullMs = 0;
          else {
              switch (currentScreen) {
                  case STATE_HOME: {
-                     String modeName = modes[activeMode].name;
-                     int modeGoal = modes[activeMode].dailyGoal;
-                     screen.showHome(modeName, modeGoal, totalDrankML, waterML);
+                     screen.showHome(activeModeName, goal, totalDrankML, waterML);
                      break;
                  }
 
                  case STATE_SELECT_MODE: {
-                     String modeName = modes[browsingModeIndex].name;
-                     int modeGoal = modes[browsingModeIndex].dailyGoal;
-                     screen.showModeMenu(modeName, modeGoal);
+                     String selectModeName = modes[browsingModeIndex].name;
+                     int selectModeGoal = modes[browsingModeIndex].dailyGoal;
+                     screen.showModeMenu(selectModeName, selectModeGoal);
                      break;
                  }
              }
