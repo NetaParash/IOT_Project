@@ -6,6 +6,7 @@
  #include "LightNotifier.h"
  #include "TestAppClient.h"
  #include <deque>
+#include "AppClient.h"
 
  using namespace std;
 
@@ -33,6 +34,14 @@
          { "Office",    2000, 90 }, // Index 2
          { "Night",     500,  0  }  // Index 3
  };
+
+
+AppClient appClient(
+    "OrZ iPhone",
+    "g0iibm9ik7ry",
+    "https://iot-project-6i3k.onrender.com"
+);
+
 
  // ========================
  // WATER LEVEL PINS (Bottom -> Top)
@@ -127,7 +136,7 @@
 
         Serial.println("[MAIN] Pulling settings from backend");
 
-        auto settings = client.getSettings();
+        auto settings = appClient.getSettings();
 
         if (settings.size() == 3) {
             String mode = settings[0];
