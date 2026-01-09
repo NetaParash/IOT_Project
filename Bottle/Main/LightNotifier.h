@@ -25,12 +25,12 @@ class LightNotifier {
     void setup() {
       _strip.begin();
       _strip.show(); 
-      _strip.setBrightness(50);
+      _strip.setBrightness(200);
     }
 
     void blinkNotification() {
       unsigned long startTime = millis();
-      unsigned long duration = 10000; 
+      unsigned long duration = 10000;
       
       uint32_t blue = _strip.Color(0, 0, 255);
       uint32_t off = _strip.Color(0, 0, 0);
