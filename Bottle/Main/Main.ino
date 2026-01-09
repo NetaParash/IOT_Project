@@ -42,6 +42,8 @@ AppClient appClient(
     "https://iot-project-6i3k.onrender.com"
 );
 
+const unsigned long SETTINGS_PULL_INTERVAL_MS = 30 * 1000;
+unsigned long lastSettingsPullMs = 0;
 
  // ========================
  // WATER LEVEL PINS (Bottom -> Top)
