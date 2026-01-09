@@ -201,6 +201,7 @@ AppClient appClient(
          if (now - lastNotificationTime >= intervalMs) {
              // Notify
              lights.blinkNotification();
+             screen.print("Time to drink!");
              // Reset timer
              lastNotificationTime = now;
          }
