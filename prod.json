@@ -1,0 +1,4 @@
+{   "REACT_APP_ENVIRONMENT": "prod",
+    "FRONTEND_PORT": "3000",
+    "APP_HOSTNAME": "https://smart-bottle-frontend.onrender.com"
+}
