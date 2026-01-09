@@ -68,7 +68,7 @@ public:
             foundLevel = _probes[i].getLevelIndex();
         }
         
-        // printStatus(foundLevel);
+         printStatus(foundLevel);
         return (foundLevel * 100) / _probes.size();
     }
 
@@ -94,22 +94,3 @@ public:
          Serial.println();
     }
 };
-
-// ==========================================
-// MAIN SETUP
-// ==========================================
-
-// WaterLevelSensor waterLevelSensor({15});
-
-// void setup() {
-//   Serial.begin(115200);
-//   delay(1000);
-
-//   waterLevelSensor.setup();
-// }
-
-// void loop() {
-//   waterLevelSensor.getWaterLevel();
-//   waterLevelSensor.debugRaw();
-//   delay(1000);
-// }

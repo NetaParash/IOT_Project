@@ -37,7 +37,7 @@
  // ========================
  // WATER LEVEL PINS (Bottom -> Top)
  // ========================
- WaterLevelSensor waterLevelSensor({14, 27, 33, 32});
+ WaterLevelSensor waterLevelSensor({15, 32, 33, 13});
 
  // ========================
  // OLED SCREEN (21/22 I2C)
