@@ -9,7 +9,7 @@ import React, {
 import config from "./config";
 
 const AppContext = createContext(null);
-const POLL_INTERVAL_MS = 1_000;
+const POLL_INTERVAL_MS = 30_000;
 
 export const AppProvider = ({ children }) => {
     // ---- authoritative state (5 only) ----
