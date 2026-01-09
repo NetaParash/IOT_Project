@@ -120,6 +120,34 @@
      btnNext.update();
 
      // =====================================================
+     // GET SETTINGS
+     // =====================================================
+    if (now - lastSettingsPullMs >= SETTINGS_PULL_INTERVAL_MS) {
+        lastSettingsPullMs = now;
+
+        Serial.println("[MAIN] Pulling settings from backend");
+
+        auto settings = client.getSettings();
+
+        if (settings.size() == 3) {
+            String mode = settings[0];
+            int goal = settings[1].toInt();
+            int alertsEvery = settings[2].toInt();
+
+            Serial.println("[MAIN] Settings updated:");
+            Serial.print("  mode: ");
+            Serial.println(mode);
+            Serial.print("  goal: ");
+            Serial.println(goal);
+            Serial.print("  alerts_every: ");
+            Serial.println(alertsEvery);
+
+            
+        } else {
+            Serial.println("[MAIN] Failed to fetch settings");
+        }
+    }
+     // =====================================================
      // MENU NAVIGATION LOGIC (STATE MACHINE)
      // =====================================================
      switch (currentScreen) {
