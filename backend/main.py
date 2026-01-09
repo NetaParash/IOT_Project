@@ -9,6 +9,7 @@ from bottle import (
 )
 from app_utils import get_water_level, get_today_drink_history, get_total_drank_today, clear_event_data
 from config import FLASK_HOST, FLASK_PORT
+import time
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -21,12 +22,13 @@ def bottle_post_event():
     if not data:
         return jsonify({"error": "No JSON received"}), 400
 
-    try:
-        event = validate_event(data)
-        save_event(event)
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
+    event = {
+        "ts": int(time.time()),
+        "amount_drank_ml": data["amount_drank_ml"],
+        "water_level_ml": data["water_level_ml"],
+    }
 
+    save_event(event)
     return jsonify({"status": "ok"}), 200
 
 @app.route("/api/bottle/settings", methods=["GET"])
