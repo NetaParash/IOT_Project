@@ -64,6 +64,8 @@ public:
                 abs(gy) > GYRO_THRESHOLD ||
                 abs(gz) > GYRO_THRESHOLD)
             {
+                String text_1 = "gx: " + String(gx) + " gy: " + String(gy) + " gz: " + String(gz);
+                Serial.println(text_1);
                 return false; // rotating
             }
 
@@ -78,6 +80,8 @@ public:
                 abs(ay) > ACCEL_TILT_THRESHOLD ||
                 abs(az - ACCEL_Z_TARGET) > ACCEL_TILT_THRESHOLD)
             {
+                String text_2 = "ax: " + String(ax) + " ay: " + String(ay) + " az: " + String(az);
+                Serial.println(text_2);
                 return false; // tilted
             }
             delay(1);

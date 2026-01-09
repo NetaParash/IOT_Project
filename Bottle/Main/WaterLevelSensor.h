@@ -68,7 +68,7 @@ public:
             foundLevel = _probes[i].getLevelIndex();
         }
         
-        printStatus(foundLevel);
+        // printStatus(foundLevel);
         return (foundLevel * 100) / _probes.size();
     }
 
