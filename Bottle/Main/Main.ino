@@ -5,37 +5,30 @@
  #include "ButtonInput.h"
  #include "LightNotifier.h"
  #include "TestAppClient.h"
+ #include "BottleMode.h"
  #include <deque>
-#include "AppClient.h"
+ #include "AppClient.h"
 
  using namespace std;
 
  // ========================
  // MODES
  // ========================
- enum BottleMode {
-     HYDRATION,
-     SPORT,
-     OFFICE,
-     NIGHT,
-     MODE_COUNT // Helper to know how many modes exist
+ #define MODE_COUNT 4
+
+ static const BottleMode modes[MODE_COUNT] = {
+         BottleMode("hydration", 2500, 60),
+         BottleMode("sport",     3500, 30),
+         BottleMode("office",    2000, 90),
+         BottleMode("night",     500,  0)
  };
 
- struct ModeConfig {
-     String name;
-     int dailyGoal;
-     int alertsEveryMinutes;
- };
+ // Initialize with mode HYDRATION (index 0)
+ BottleMode currentMode(modes[0].name, modes[0].dailyGoal, modes[0].alertEveryMinutes);
 
- // Modes Configuration
- static const ModeConfig modes[MODE_COUNT] = {
-         { "hydration", 2500, 5 }, // Index 0
-         { "sport",     3500, 1 }, // Index 1
-         { "office",    2000, 90 }, // Index 2
-         { "night",     500,  0  }  // Index 3
- };
-
-
+ // ========================
+ // APPLICATION
+ // ========================
 AppClient appClient(
     "Pura Vida", //"OrZ iPhone",
     "L&Y26100612", //"g0iibm9ik7ry",
@@ -90,11 +83,6 @@ unsigned long lastSettingsPullMs = 0;
  MenuState currentScreen = STATE_HOME;
  int browsingModeIndex = 0; // Index to track which mode we are currently looking at in the menu
 
- // Initialize with mode HYDRATION
- String activeModeName = modes[HYDRATION].name;
- int goal = modes[HYDRATION].dailyGoal;
- int alertsEvery = modes[HYDRATION].alertsEveryMinutes;
-
  // ========================
  // DRINK TRACKING
  // ========================
@@ -145,17 +133,17 @@ unsigned long lastSettingsPullMs = 0;
         auto settings = appClient.getSettings();
 
         if (settings.size() == 3) {
-            activeModeName = settings[0];
-            goal = settings[1].toInt();
-            alertsEvery = settings[2].toInt();
+            currentMode.name = settings[0];
+            currentMode.dailyGoal = settings[1].toInt();
+            currentMode.alertEveryMinutes = settings[2].toInt();
 
             Serial.println("[MAIN] Settings updated:");
             Serial.print("  mode: ");
-            Serial.println(activeModeName);
+            Serial.println(currentMode.name);
             Serial.print("  goal: ");
-            Serial.println(goal);
+            Serial.println(currentMode.dailyGoal);
             Serial.print("  alerts_every: ");
-            Serial.println(alertsEvery);
+            Serial.println(currentMode.alertEveryMinutes);
 
             
         } else {
@@ -182,14 +170,13 @@ unsigned long lastSettingsPullMs = 0;
          case STATE_SELECT_MODE:
              if (btnSelect.wasPressed()) {
                  // Update mode, goal and alert interval
-                 int idx = (BottleMode)browsingModeIndex;
-                 activeModeName = modes[idx].name;
-                 goal = modes[idx].dailyGoal;
-                 alertsEvery = modes[idx].alertsEveryMinutes;
+                 currentMode.name = modes[browsingModeIndex].name;
+                 currentMode.dailyGoal = modes[browsingModeIndex].dailyGoal;
+                 currentMode.alertEveryMinutes = modes[browsingModeIndex].alertEveryMinutes;
                  currentScreen = STATE_HOME;
 
                  // Send new setting to the application
-                 appClient.sendSettings(activeModeName, goal, alertsEvery);
+                 appClient.sendSettings(currentMode.name, currentMode.dailyGoal, currentMode.alertEveryMinutes);
 
                  // Reset the notifications timer on mode change
                  lastNotificationTime = now;
@@ -207,9 +194,8 @@ unsigned long lastSettingsPullMs = 0;
      // NOTIFICATION
      // =====================================================
 
-     if (alertsEvery > 0) {
-         unsigned long intervalMs = (unsigned long)alertsEvery * 60 * 1000;
-         if (now - lastNotificationTime >= intervalMs) {
+     if (currentMode.alertEveryMinutes > 0) {
+         if (now - lastNotificationTime >= currentMode.getAlertIntervalMs()) {
              // Notify
              lights.blinkNotification();
              screen.print("Time to drink!");
@@ -266,7 +252,7 @@ unsigned long lastSettingsPullMs = 0;
          else {
              switch (currentScreen) {
                  case STATE_HOME: {
-                     screen.showHome(activeModeName, goal, totalDrankML, waterML);
+                     screen.showHome(currentMode.name, currentMode.dailyGoal, totalDrankML, waterML);
                      break;
                  }
 
