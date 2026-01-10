@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import BottleLiquidGauge from "./BottleLiquidGauge";
 
-const POLL_INTERVAL_MS = 30_000;
+const POLL_INTERVAL_MS = 1_000;
 
 export default function BottleGaugeContainer() {
     const [percent, setPercent] = useState(0);

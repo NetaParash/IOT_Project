@@ -6,7 +6,7 @@ import { useAppContext } from "../AppContext";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 
 
-const POLL_INTERVAL_MS = 30_000;
+const POLL_INTERVAL_MS = 1_000;
 
 export default function DrinkingAmountGraph() {
     const [points, setPoints] = useState([]);
