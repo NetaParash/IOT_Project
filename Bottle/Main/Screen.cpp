@@ -36,7 +36,7 @@ void Screen::showHome(String modeName, int dailyGoal, int totalDrank, int curren
 
     String text = "Mode: " + modeName + "\n";
     text += "Goal: " + String(dailyGoal) + " mL\n";
-    text += "Reached: " + String(goalPercent) + "% (" + String(totalDrank) + ")\n";
+    text += "Reached: " + String(goalPercent) + "% (" + String(totalDrank) + " mL)\n";
     text += "---------------------\n";
     text += "Level: " + String(currentLevel) + " mL";
 

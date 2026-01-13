@@ -152,6 +152,49 @@ public:
         return result;
     }
 
+    int getLastTotalDrank() {
+        Serial.println("[HTTP] getLastTotalDrank()");
+        int result = 0;
+        if (!connectWiFi()) {
+            Serial.println("[HTTP] WiFi unavailable, skipping getSettings");
+            return result;
+        }
+
+        WiFiClientSecure client;
+        client.setInsecure();
+
+        HTTPClient https;
+        String url = _backend + "/api/app/total-drank-today";
+
+        Serial.print("[HTTP] GET ");
+        Serial.println(url);
+
+        https.begin(client, url);
+        int code = https.GET();
+
+        Serial.print("[HTTP] status: ");
+        Serial.println(code);
+
+        if (code == 200) {
+            String body = https.getString();
+            Serial.print("[HTTP] response: ");
+            Serial.println(body);
+
+            StaticJsonDocument<200> doc;
+            DeserializationError err = deserializeJson(doc, body);
+
+            if (!err) {
+                result = doc["total_drank_today_ml"].as<int>();
+            } else {
+                Serial.print("[JSON] parse error: ");
+                Serial.println(err.c_str());
+            }
+        }
+
+        https.end();
+        return result;
+    }
+
     /* ========================
        Send drink event
        ======================== */
