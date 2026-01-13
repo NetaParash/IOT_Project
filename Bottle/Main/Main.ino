@@ -35,8 +35,11 @@ AppClient appClient(
     "https://iot-project-6i3k.onrender.com"
 );
 
-const unsigned long SETTINGS_PULL_INTERVAL_MS = 30 * 1000;
+const unsigned long SETTINGS_PULL_INTERVAL_MS = (30 * 10000); // 30 seconds
 unsigned long lastSettingsPullMs = 0;
+
+const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (10 * 10000); // 1 seconds
+unsigned long lastWaterSendEventMs = 0;
 
  // ========================
  // WATER LEVEL PINS (Bottom -> Top)
@@ -57,7 +60,7 @@ unsigned long lastSettingsPullMs = 0;
  // BUTTONS
  // ========================
  Button btnNext(4);
- Button btnSelect(5);
+ Button btnSelect(18);
 
  // ========================
  // LIGHTS
@@ -109,6 +112,9 @@ unsigned long lastSettingsPullMs = 0;
      lastNotificationTime = millis();
 
      testAppClientDrainBottle();
+
+     screen.print("Pulling drinking data from application");
+     totalDrankML = appClient.getLastTotalDrank();
 
      screen.print("System Ready");
  }
@@ -234,6 +240,12 @@ unsigned long lastSettingsPullMs = 0;
                      lastStableLevel = all;
                  }
                  lastWaterLevel.pop_front();
+             }
+
+             // Send water level reading to the application (once in every fixed time interval)
+             if (now - lastWaterSendEventMs >= WATER_SEND_EVENT_INTERVAL_MS) {
+                 lastWaterSendEventMs = now;
+                 appClient.sendEvent(totalDrankML, waterML);
              }
          }
      }
