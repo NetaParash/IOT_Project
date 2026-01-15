@@ -7,19 +7,6 @@
 #include <driver/touch_pad.h>
 
 // ==========================================
-// THRESHOLDS CONFIGURATION
-// ==========================================
-
-// 1. WET vs DRY
-// When reading drops below this, we consider the pad "Active"
-const int THRESH_WET = 680;
-
-// 2. LOW HALF vs HIGH HALF
-// When reading drops below this, we are in the "Top Half" of the pad
-const int THRESH_MID_START = 600;
-const int THRESH_MID_STOP  = 630; // Must rise above this to go back to "Low Half"
-
-// ==========================================
 // CLASS: WaterProbe (logic for a single touch pad for detecting if it touches water)
 // ==========================================
 class WaterProbe {
@@ -27,11 +14,18 @@ private:
     uint8_t _pin;
     touch_pad_t _touchPadIndex;
 
+    // Thresholds:
+    int thresh_wet;
+    int thresh_mid_low;
+    int thresh_mid_high;
+
+    // These fields are updated by the update() method, using the touch pad's pre-defined thresholds.
     bool _isWet;       // Is water touching this pad?
     bool _isTopHalf;   // Is water in the upper 50% of this pad?
 
 public:
-    WaterProbe(uint8_t pin) : _pin(pin), _isWet(false), _isTopHalf(false) {
+    WaterProbe(uint8_t pin, int wet, int mid_low, int mid_high) : _pin(pin), _isWet(false),
+    _isTopHalf(false), thresh_wet(wet), thresh_mid_low(mid_low), thresh_mid_high(mid_high) {
         _touchPadIndex = (touch_pad_t) digitalPinToTouchChannel(pin);
     }
 
@@ -45,18 +39,18 @@ public:
         touch_pad_read_filtered(_touchPadIndex, &val);
 
         // --- Detect Wet/Dry ---
-        if (!_isWet && val < THRESH_WET) {
+        if (!_isWet && val < thresh_wet) {
             _isWet = true;
-        } else if (_isWet && val > THRESH_WET) {
+        } else if (_isWet && val > thresh_wet) {
             _isWet = false;
             _isTopHalf = false; // Reset half state if dry
         }
 
         // --- Detect Half (Only if Wet) ---
         if (_isWet) {
-            if (!_isTopHalf && val < THRESH_MID_START) {
+            if (!_isTopHalf && val < thresh_mid_low) {
                 _isTopHalf = true;
-            } else if (_isTopHalf && val > THRESH_MID_STOP) {
+            } else if (_isTopHalf && val > thresh_mid_high) {
                 _isTopHalf = false;
             }
         }
@@ -80,9 +74,9 @@ private:
     std::vector<WaterProbe> _probes;
 
 public:
-    WaterLevelSensor(std::vector<int> pins) {
-        for (int pin : pins) {
-            _probes.push_back(WaterProbe(pin));
+    WaterLevelSensor(std::vector<int> pins, std::vector<std::vector<int>> thresholds) {
+        for (int i=0; i<pins.size(); i++) {
+            _probes.push_back(WaterProbe(pins[i], thresholds[i][0], thresholds[i][1], thresholds[i][2]));
         }
     }
 
