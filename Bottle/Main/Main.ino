@@ -115,6 +115,7 @@ unsigned long lastWaterSendEventMs = 0;
      Wire.begin(21, 22);
 
      screen.setup();
+     screen.attachAppClient(&appClient);
      screen.print("Initializing...");
 
      lights.setup();

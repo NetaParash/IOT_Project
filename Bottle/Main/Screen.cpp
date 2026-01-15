@@ -1,13 +1,11 @@
 #include "Screen.h"
+#include "AppClient.h"
 
 Screen::Screen(HardwareSerial& s, int sda, int scl)
     : serial(s),
       sdaPin(sda),
       sclPin(scl),
-      display(128, 64, &Wire)   // SH1106G constructor
-{
-}
-
+      display(128, 64, &Wire) {}
 
 void Screen::setup() {
     // Wire.begin(sdaPin, sclPin);
@@ -18,6 +16,23 @@ void Screen::setup() {
     display.setTextColor(SH110X_WHITE);
     display.setCursor(0, 0);
     serial.println("Screen initialized.");
+}
+
+void Screen::attachAppClient(AppClient *client) {
+    _appClient = client;
+}
+
+String Screen::_getWifiText() {
+    if (_appClient == nullptr) {
+        return "";
+    }
+
+    if (_appClient->isConnectedToWIFI) {
+        return "Connected to WIFI: " + String(_appClient->getSSID());
+    }
+    else {
+        return "Not connected to WIFI";
+    }
 }
 
 void Screen::print(String text) {
@@ -40,6 +55,8 @@ void Screen::showHome(String modeName, int dailyGoal, int totalDrank, int curren
     text += "---------------------\n";
     text += "Level: " + String(currentLevel) + " mL";
 
+    text += "\n---------------------\n"; //TODO: Check the amount of new lines needed to this appears at the bottom
+    text += _getWifiText();
     print(text);
 }
 
@@ -47,6 +64,8 @@ void Screen::showModeMenu(String modeName, int dailyGoal) {
     String text = "Press Select to set:\n";
     text += modeName + " Mode\n";
     text += "(" + String(dailyGoal / 1000.0, 1) + " Liters)";
-    
+
+    text += "\n\n\n---------------------\n"; //TODO: Check the amount of new lines needed to this appears at the bottom
+    text += _getWifiText();
     print(text);
 }

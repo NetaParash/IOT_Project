@@ -9,6 +9,10 @@
 
 class AppClient {
 public:
+    // Boolean flag maintaining state from the last connection attempt via connectWiFi function.
+    // This flag is used to reflect the current state, without making another connection attempt.
+    bool isConnectedToWIFI;
+
     /* ========================
        Constructor
        ======================== */
@@ -17,7 +21,13 @@ public:
               const char* backendDomain)
         : _ssid(ssid),
           _password(password),
-          _backend(backendDomain) {}
+          _backend(backendDomain) {
+        isConnectedToWIFI = false;
+    }
+
+    const char* getSSID() const {
+        return _ssid;
+    }
 
     /* ========================
        WiFi connection
@@ -25,6 +35,7 @@ public:
     bool connectWiFi(unsigned long timeoutMs = 5000) {
         if (WiFi.status() == WL_CONNECTED) {
             Serial.println("[WiFi] already connected");
+            isConnectedToWIFI = true;
             return true;
         }
 
@@ -37,6 +48,7 @@ public:
         while (WiFi.status() != WL_CONNECTED) {
             if (millis() - start > timeoutMs) {
                 Serial.println("[WiFi] connection timeout");
+                isConnectedToWIFI = false;
                 return false;
             }
             Serial.print(".");
@@ -47,6 +59,7 @@ public:
         Serial.println("[WiFi] connected");
         Serial.print("[WiFi] IP: ");
         Serial.println(WiFi.localIP());
+        isConnectedToWIFI = true;
         return true;
     }
 
