@@ -42,9 +42,22 @@ const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (10 * 10000); // 1 seconds
 unsigned long lastWaterSendEventMs = 0;
 
  // ========================
- // WATER LEVEL PINS (Bottom -> Top)
+ // WATER LEVEL PINS & THRESHOLDS (ordered Bottom -> Top)
  // ========================
- WaterLevelSensor waterLevelSensor({15, 32, 33, 13});
+ vector<int> touch_pads_pins = {15, 32, 33, 13};
+ // Each touchpad requires 3 thresholds:
+ // WET THRESH is a threshold for defining if the pad water has reached this probe.
+ // Two threshold are needed to determine if water has passed the half-point of the probe:
+ // If water level was lower than half ("bottom half"), the reading must drop below the LOW THRESH to move to the "top half".
+ // If water level was higher than half ("top half"), the reading must rise above the HIGH THRESH to move to the "bottom half".
+ vector<vector<int>> thresholds = {
+         // wet thresh, mid-low thresh, mid-high thresh
+         {680, 600, 630},
+         {680, 600, 630},
+         {680, 600, 630},
+         {680, 600, 630},
+ };
+ WaterLevelSensor waterLevelSensor(touch_pads_pins, thresholds);
 
  // ========================
  // OLED SCREEN (21/22 I2C)
