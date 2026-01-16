@@ -3,12 +3,14 @@ import DashboardCard from "../components/DashboardCard";
 import WaterLevel from "../components/WaterLevel";
 import DrinkingAmountGraph from "../components/DrinkingAmountGraph";
 import { useAppContext } from "../AppContext";
+import BottleDropdown from "../components/BottleDropdown";
 
 export default function DashboardPage() {
     const { goal, drankToday } = useAppContext();
 
     return (
         <>
+            <BottleDropdown />
             {/* ===== Row 1 ===== */}
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>

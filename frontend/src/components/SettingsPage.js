@@ -10,6 +10,7 @@ import {
 import { useAppContext } from "../AppContext";
 import DashboardCard from "../components/DashboardCard";
 import config from "../config";
+import BottleDropdown from "./BottleDropdown";
 
 const MODES = {
     hydration: {
@@ -78,6 +79,8 @@ export default function SettingsPage() {
     };
 
     return (
+        <>
+            <BottleDropdown />
         <Grid container spacing={3}>
             {/* ===== Mode ===== */}
             <Grid item size={12}>
@@ -151,5 +154,6 @@ export default function SettingsPage() {
                 </DashboardCard>
             </Grid>
         </Grid>
+        </>
     );
 }
