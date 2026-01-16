@@ -7,9 +7,9 @@ import { useLocation } from "react-router-dom";
 import { appPages } from "../PagesConfig";
 
 const NAMES = [
-    "Liat", "Noa", "Yonatan", "Tal", "Gili",
-    "Roni", "Shira", "Amit", "Inbar", "Maayan",
-    "Yael", "Daniel", "Alon", "Eden", "Tomer",
+    "Liat", "Neta", "Or", "Tom", "Lama",
+    "Itay", "Avigail", "Wesam", "Ilay", "Ido",
+    "Noa", "Daniel", "Alon", "Eden", "Tomer",
     "Noga", "Omer", "Rotem", "Gal", "Yuval"
 ];
 

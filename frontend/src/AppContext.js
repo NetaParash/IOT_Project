@@ -12,9 +12,9 @@ const AppContext = createContext(null);
 const POLL_INTERVAL_MS = 30_000;
 
 const NAMES = [
-    "Liat", "Noa", "Yonatan", "Tal", "Gili",
-    "Roni", "Shira", "Amit", "Inbar", "Maayan",
-    "Yael", "Daniel", "Alon", "Eden", "Tomer",
+    "Liat", "Neta", "Or", "Tom", "Lama",
+    "Itay", "Avigail", "Wesam", "Ilay", "Ido",
+    "Noa", "Daniel", "Alon", "Eden", "Tomer",
     "Noga", "Omer", "Rotem", "Gal", "Yuval"
 ];
 
