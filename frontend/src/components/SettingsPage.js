@@ -46,16 +46,22 @@ export default function SettingsPage() {
         setMode,
         setGoal,
         setAlertsEvery,
+        selectedBottleId,
     } = useAppContext();
 
     const isCustom = mode === "custom";
 
     const updateSettings = async (payload) => {
-        await fetch(`${config.API_BASE_URL}/api/app/settings`, {
+        await fetch(`${config.API_BASE_URL}/api/app/${selectedBottleId}/settings`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({
+                mode,
+                goal,
+                alerts_every: alertsEvery
+            }),
         });
+
     };
 
     const onModeChange = (_, newMode) => {
