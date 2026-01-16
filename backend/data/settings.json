@@ -1,1 +1,102 @@
-{"mode": "custom", "goal": 2000, "alerts_every": 90}
+{
+  "1": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "2": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "3": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "4": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "5": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "6": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "7": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "8": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "9": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "10": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "11": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "12": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "13": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "14": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "15": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "16": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "17": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "18": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "19": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  },
+  "20": {
+    "mode": "hydration",
+    "goal": 2500,
+    "alerts_every": 60
+  }
+}
