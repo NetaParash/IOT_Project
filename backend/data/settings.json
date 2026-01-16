@@ -35,9 +35,9 @@
     "alerts_every": 60
   },
   "8": {
-    "mode": "hydration",
-    "goal": 2500,
-    "alerts_every": 60
+    "mode": "sport",
+    "goal": 3500,
+    "alerts_every": 30
   },
   "9": {
     "mode": "hydration",

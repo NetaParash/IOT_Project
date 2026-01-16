@@ -59,11 +59,7 @@ def get_total_drank_today(bottle_id: int) -> int:
         tzinfo=timezone.utc,
     ).timestamp()
 
-    return sum(
-        e["amount_drank_ml"]
-        for e in events
-        if e.get("amount_drank_ml", 0) > 0 and e["ts"] >= today_start
-    )
+    return events[-1]["amount_drank_ml"]
 
 
 def clear_event_data(bottle_id: int):

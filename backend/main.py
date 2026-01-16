@@ -13,6 +13,7 @@ from app_utils import (
     clear_event_data,
 )
 from config import FLASK_HOST, FLASK_PORT
+from generate_mock_events import generate_mock_events
 import time
 
 app = Flask(__name__)
@@ -123,6 +124,12 @@ def delete_event_data(bottle_id):
             "message": str(e)
         }), 500
 
+# main.py
+
+@app.route("/api/app/generate-mock-events", methods=["POST"])
+def generate_mock_events_route():
+    generate_mock_events()
+    return jsonify({"status": "ok"}), 200
 
 if __name__ == "__main__":
     app.run(host=FLASK_HOST, port=FLASK_PORT, debug=True)
