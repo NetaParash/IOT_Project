@@ -5,22 +5,25 @@ import config from "../config";
 import { useAppContext } from "../AppContext";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
 
-
 const POLL_INTERVAL_MS = 1_000;
 
 export default function DrinkingAmountGraph() {
     const [points, setPoints] = useState([]);
-    const { goal } = useAppContext();
+    const { selectedBottleId, goal } = useAppContext();
 
     const fetchTodayHistory = async () => {
+        if (!selectedBottleId) return;
+
         try {
             const res = await fetch(
-                `${config.API_BASE_URL}/api/app/drink-amount-graph`
+                `${config.API_BASE_URL}/api/app/${selectedBottleId}/drink-amount-graph`
             );
+
             const json = await res.json();
 
+
             const parsed = json.map((p) => ({
-                x: new Date(p.x).getTime(), // use number, faster compare
+                x: new Date(p.x).getTime(),
                 y: p.y,
             }));
 
@@ -40,11 +43,21 @@ export default function DrinkingAmountGraph() {
     };
 
     useEffect(() => {
+        if (!selectedBottleId) return;
+
+        // 🔥 reset graph when bottle changes
+        setPoints([]);
+
         fetchTodayHistory();
 
         const interval = setInterval(fetchTodayHistory, POLL_INTERVAL_MS);
         return () => clearInterval(interval);
-    }, []);
+
+    }, [selectedBottleId]); // 🔥 bottle-aware
+
+    if (!selectedBottleId) {
+        return <CircularProgress size={24} />;
+    }
 
     if (points.length === 0) {
         return <CircularProgress size={24} />;
@@ -63,6 +76,7 @@ export default function DrinkingAmountGraph() {
                         color: "#3A7BD5",
                     },
                 ]}
+
                 xAxis={[
                     {
                         dataKey: "x",
@@ -75,6 +89,7 @@ export default function DrinkingAmountGraph() {
                             }),
                     },
                 ]}
+
                 yAxis={[
                     {
                         label: "ml",
@@ -82,17 +97,18 @@ export default function DrinkingAmountGraph() {
                         max: goal,
                     },
                 ]}
-                margin={{ left: 60, right: 20, top: 20, bottom: 40 }}
-            >  <ChartsReferenceLine
-                y={goal}
-                label={`Daily Goal: ${goal} ml`}
-                lineStyle={{ stroke: "#4CAF50"}}
-                labelStyle={{
-                    fontSize: 20,
-                    fontWeight: 600,
 
-                }}
-            />
+                margin={{ left: 60, right: 20, top: 20, bottom: 40 }}
+            >
+                <ChartsReferenceLine
+                    y={goal}
+                    label={`Daily Goal: ${goal} ml`}
+                    lineStyle={{ stroke: "#4CAF50" }}
+                    labelStyle={{
+                        fontSize: 20,
+                        fontWeight: 600,
+                    }}
+                />
             </LineChart>
         </Box>
     );
