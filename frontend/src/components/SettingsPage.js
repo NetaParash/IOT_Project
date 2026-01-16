@@ -135,7 +135,7 @@ export default function SettingsPage() {
                         value={alertsEvery}
                         min={0}
                         max={180}
-                        step={15}
+                        step={1}
                         disabled={!isCustom}
                         onChange={(_, v) => setAlertsEvery(v)}
                         sx={{ height: 12 }}
