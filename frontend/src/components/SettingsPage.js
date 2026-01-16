@@ -115,7 +115,7 @@ export default function SettingsPage() {
                     </Typography>
                     <Slider
                         value={goal}
-                        min={500}
+                        min={0}
                         max={5000}
                         step={100}
                         disabled={!isCustom}
