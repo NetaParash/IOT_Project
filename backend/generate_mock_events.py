@@ -6,8 +6,7 @@ from pathlib import Path
 # -----------------------------
 # CONFIG
 # -----------------------------
-DATA_DIR = Path("data")
-DATA_DIR.mkdir(exist_ok=True)
+from config import DATA_DIR
 
 GOAL = 2500
 
