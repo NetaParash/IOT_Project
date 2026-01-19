@@ -4,7 +4,6 @@
  #include "GyroSensor.h"
  #include "ButtonInput.h"
  #include "LightNotifier.h"
- #include "TestAppClient.h"
  #include "BottleMode.h"
  #include <deque>
  #include "AppClient.h"
@@ -26,19 +25,20 @@
  // Initialize with mode HYDRATION (index 0)
  BottleMode currentMode(modes[0].name, modes[0].dailyGoal, modes[0].alertEveryMinutes);
 
+int bottleId = 1;
  // ========================
  // APPLICATION
  // ========================
 AppClient appClient(
     "2Caesars", //"OrZ iPhone",
     "14121998", //"g0iibm9ik7ry",
-    "https://iot-project-6i3k.onrender.com"
+    "https://iot-project-6i3k.onrender.com", bottleId
 );
 
-const unsigned long SETTINGS_PULL_INTERVAL_MS = (30 * 10000); // 30 seconds
+const unsigned long SETTINGS_PULL_INTERVAL_MS = (30 * 1000); // 30 seconds
 unsigned long lastSettingsPullMs = 0;
 
-const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (30 * 10000); // 30 seconds
+const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (30 * 1000); // 30 seconds
 unsigned long lastWaterSendEventMs = 0;
 
  // ========================
@@ -123,7 +123,6 @@ vector<vector<int>> thresholds = {
      waterLevelSensor.setup();
      lastNotificationTime = millis();
 
-     testAppClientDrainBottle();
 
      screen.print("Pulling drinking data from application");
      totalDrankML = appClient.getLastTotalDrank();
