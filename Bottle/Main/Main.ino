@@ -30,32 +30,30 @@
  // APPLICATION
  // ========================
 AppClient appClient(
-    "Pura Vida", //"OrZ iPhone",
-    "L&Y26100612", //"g0iibm9ik7ry",
+    "2Caesars", //"OrZ iPhone",
+    "14121998", //"g0iibm9ik7ry",
     "https://iot-project-6i3k.onrender.com"
 );
 
 const unsigned long SETTINGS_PULL_INTERVAL_MS = (30 * 10000); // 30 seconds
 unsigned long lastSettingsPullMs = 0;
 
-const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (10 * 10000); // 1 seconds
+const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (30 * 10000); // 30 seconds
 unsigned long lastWaterSendEventMs = 0;
 
  // ========================
  // WATER LEVEL PINS & THRESHOLDS (ordered Bottom -> Top)
  // ========================
- vector<int> touch_pads_pins = {15, 32, 33, 13};
- // Each touchpad requires 3 thresholds:
- // WET THRESH is a threshold for defining if the pad water has reached this probe.
- // Two threshold are needed to determine if water has passed the half-point of the probe:
- // If water level was lower than half ("bottom half"), the reading must drop below the LOW THRESH to move to the "top half".
- // If water level was higher than half ("top half"), the reading must rise above the HIGH THRESH to move to the "bottom half".
- vector<vector<int>> thresholds = {
-         // wet thresh, mid-low thresh, mid-high thresh
-         {680, 600, 630},
-         {680, 600, 630},
-         {680, 600, 630},
-         {680, 600, 630},
+ vector<int> touch_pads_pins = {32, 15, 33, 13};
+// 4 thresholds per probe: To ensure stability, we use dual thresholds:
+// Wet state: Drop below WET-LOW to activate, rise above WET-HIGH to clear.
+// Mid-point: Drop below MID-LOW for "top half", rise above MID-HIGH for "bottom".
+vector<vector<int>> thresholds = {
+         // wet-low thresh, wet-high thresh, mid-low thresh, mid-high thresh
+         {570, 630, 455, 470},
+         {580, 615, 425, 445},
+         {550, 610, 420, 435},
+         {520, 560, 400, 420},
  };
  WaterLevelSensor waterLevelSensor(touch_pads_pins, thresholds);
 
@@ -115,6 +113,7 @@ unsigned long lastWaterSendEventMs = 0;
      Wire.begin(21, 22);
 
      screen.setup();
+     screen.attachAppClient(&appClient);
      screen.print("Initializing...");
 
      lights.setup();
@@ -239,7 +238,7 @@ unsigned long lastWaterSendEventMs = 0;
              waterML = (levelPercent * BOTTLE_ML) / 100;
 
              lastWaterLevel.push_back(waterML);
-             if (lastWaterLevel.size() == 10) {
+             if (lastWaterLevel.size() == 20) {
                  int all = lastWaterLevel.front();
                  bool consistent = true;
 
