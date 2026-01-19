@@ -50,8 +50,8 @@ unsigned long lastWaterSendEventMs = 0;
 // Mid-point: Drop below MID-LOW for "top half", rise above MID-HIGH for "bottom".
 vector<vector<int>> thresholds = {
          // wet-low thresh, wet-high thresh, mid-low thresh, mid-high thresh
-         {570, 630, 460, 480},
-         {580, 620, 425, 450},
+         {570, 630, 455, 470},
+         {580, 615, 425, 445},
          {550, 610, 420, 435},
          {520, 560, 400, 420},
  };
@@ -238,7 +238,7 @@ vector<vector<int>> thresholds = {
              waterML = (levelPercent * BOTTLE_ML) / 100;
 
              lastWaterLevel.push_back(waterML);
-             if (lastWaterLevel.size() == 10) {
+             if (lastWaterLevel.size() == 20) {
                  int all = lastWaterLevel.front();
                  bool consistent = true;
 
