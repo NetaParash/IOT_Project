@@ -10,6 +10,7 @@ import {
 import { useAppContext } from "../AppContext";
 import DashboardCard from "../components/DashboardCard";
 import config from "../config";
+import BottleDropdown from "./BottleDropdown";
 
 const MODES = {
     hydration: {
@@ -45,16 +46,22 @@ export default function SettingsPage() {
         setMode,
         setGoal,
         setAlertsEvery,
+        selectedBottleId,
     } = useAppContext();
 
     const isCustom = mode === "custom";
 
     const updateSettings = async (payload) => {
-        await fetch(`${config.API_BASE_URL}/api/app/settings`, {
+        await fetch(`${config.API_BASE_URL}/api/app/${selectedBottleId}/settings`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({
+                mode,
+                goal,
+                alerts_every: alertsEvery
+            }),
         });
+
     };
 
     const onModeChange = (_, newMode) => {
@@ -78,6 +85,8 @@ export default function SettingsPage() {
     };
 
     return (
+        <>
+            <BottleDropdown />
         <Grid container spacing={3}>
             {/* ===== Mode ===== */}
             <Grid item size={12}>
@@ -106,7 +115,7 @@ export default function SettingsPage() {
                     </Typography>
                     <Slider
                         value={goal}
-                        min={500}
+                        min={0}
                         max={5000}
                         step={100}
                         disabled={!isCustom}
@@ -126,7 +135,7 @@ export default function SettingsPage() {
                         value={alertsEvery}
                         min={0}
                         max={180}
-                        step={15}
+                        step={1}
                         disabled={!isCustom}
                         onChange={(_, v) => setAlertsEvery(v)}
                         sx={{ height: 12 }}
@@ -151,5 +160,6 @@ export default function SettingsPage() {
                 </DashboardCard>
             </Grid>
         </Grid>
+        </>
     );
 }

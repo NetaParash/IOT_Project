@@ -19,6 +19,5 @@ try {
 // Construct additional computed values based on loaded config
 // sharedConfig.API_BASE_URL = `http://127.0.0.1:5003`;
 sharedConfig.API_BASE_URL = `https://iot-project-6i3k.onrender.com`;
-
 // Export the entire configuration object
 export default sharedConfig;

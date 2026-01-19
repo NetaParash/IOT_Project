@@ -1,47 +1,135 @@
-import {Box, Divider, IconButton, Link, Slide, Typography} from "@mui/material";
-import React, {useState} from "react";
+import {
+    Box,
+    Button,
+    Divider,
+    IconButton,
+    Link,
+    Slide,
+    Typography
+} from "@mui/material";
+import React, { useState } from "react";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import {useNavigate} from "react-router-dom";
-import {useAppContext} from "../AppContext"; // Assuming you're using React Router
+import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../AppContext";
+import config from "../config";
 
 export default function WelcomePage() {
-    const [showDropdown, setShowDropdown] = useState(true);
-    const {setIsDrawerOpen} = useAppContext();
+    const [loading, setLoading] = useState(false);
+    const { setIsDrawerOpen } = useAppContext();
     const navigate = useNavigate();
 
+    const handleGenerateMockEvents = async () => {
+        try {
+            setLoading(true);
 
-    return (<>
-            <Slide direction="up" in={true} mountOnEnter unmountOnExit timeout={{
-                enter: 1000,
-            }}>
+            const res = await fetch(
+                `${config.API_BASE_URL}/api/app/generate-mock-events`,
+                { method: "POST" }
+            );
+
+            if (!res.ok) {
+                throw new Error("Failed to generate mock events");
+            }
+
+            alert("Mock events generated successfully!");
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong while generating mock events.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleDeleteBottle1Events = async () => {
+        try {
+            setLoading(true);
+
+            const res = await fetch(
+                `${config.API_BASE_URL}/api/app/1/clear-event-data`,
+                { method: "POST" }
+            );
+
+            if (!res.ok) {
+                throw new Error("Failed to clear events for bottle 1");
+            }
+
+            alert("Bottle 1 events deleted successfully!");
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong while deleting events.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    return (
+        <>
+            <Slide
+                direction="up"
+                in={true}
+                mountOnEnter
+                unmountOnExit
+                timeout={{ enter: 1000 }}
+            >
                 <Box
                     sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
                         padding: 2,
-                        position: 'center',
-                        textAlign: 'center',
+                        textAlign: "center",
                     }}
                 >
                     <Typography variant="h1" component="h1" gutterBottom>
                         Welcome to Smart Bottle!
                     </Typography>
+
                     <Box
                         component="img"
                         alt="Or Zohar's Football Site Logo"
                         sx={{
-                            maxHeight: {xs: 200, md: 200},
-                            maxWidth: {xs: 200, md: 250},
+                            maxHeight: { xs: 200, md: 200 },
+                            maxWidth: { xs: 200, md: 250 },
                             padding: 2,
                         }}
                         src="../../logo.png"
                     />
 
+                    {/* 🔥 Generate Mock Events Button */}
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleGenerateMockEvents}
+                        disabled={loading}
+                        sx={{
+                            mt: 3,
+                            fontSize: 18,
+                            paddingX: 3,
+                            paddingY: 1.5,
+                            borderRadius: 2
+                        }}
+                    >
+                        {loading ? "Working..." : "Generate Mock Events"}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={handleDeleteBottle1Events}
+                        disabled={loading}
+                        sx={{
+                            mt: 2,
+                            fontSize: 18,
+                            paddingX: 3,
+                            paddingY: 1.5,
+                            borderRadius: 2
+                        }}
+                    >
+                        Clear Data
+                    </Button>
+
                 </Box>
             </Slide>
-
         </>
     );
 }

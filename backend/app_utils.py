@@ -1,10 +1,9 @@
 from datetime import datetime, timezone
-from bottle import load_events
+from bottle import load_events, clear_events
 from typing import Dict, Any
-from config import BOTTLE_CAPACITY_ML, EVENTS_FILE
+from config import BOTTLE_CAPACITY_ML
 
-
-def get_today_drink_history():
+def get_today_drink_history(bottle_id: int):
     now = datetime.now(timezone.utc)
     today_start = datetime(
         year=now.year,
@@ -13,7 +12,7 @@ def get_today_drink_history():
         tzinfo=timezone.utc,
     ).timestamp()
 
-    events = load_events()
+    events = load_events(bottle_id)
 
     chart_points = [
         {
@@ -23,16 +22,11 @@ def get_today_drink_history():
         for e in events
         if e.get("amount_drank_ml", 0) > 0 and e["ts"] >= today_start
     ]
-    print(chart_points)
     return chart_points
 
 
-def get_water_level() -> Dict[str, Any]:
-    """
-    Return current water level for the app.
-    Safe for polling every ~30s.
-    """
-    events = load_events()
+def get_water_level(bottle_id: int) -> Dict[str, Any]:
+    events = load_events(bottle_id)
 
     if not events:
         return {
@@ -50,22 +44,23 @@ def get_water_level() -> Dict[str, Any]:
     }
 
 
-def get_total_drank_today():
-    events = load_events()
+def get_total_drank_today(bottle_id: int) -> int:
+    events = load_events(bottle_id)
 
     if not events:
-        return {
-            "water_level_ml": 0,
-            "capacity_ml": BOTTLE_CAPACITY_ML,
-            "ts": None,
-        }
+        return 0
 
-    last_event = events[-1]
+    # sum of all drink events today
+    now = datetime.now(timezone.utc)
+    today_start = datetime(
+        year=now.year,
+        month=now.month,
+        day=now.day,
+        tzinfo=timezone.utc,
+    ).timestamp()
 
-    return last_event["amount_drank_ml"]
-
-# app_utils.py
+    return events[-1]["amount_drank_ml"]
 
 
-def clear_event_data():
-    open(EVENTS_FILE, "w").close()
+def clear_event_data(bottle_id: int):
+    clear_events(bottle_id)

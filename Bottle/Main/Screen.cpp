@@ -55,7 +55,7 @@ void Screen::showHome(String modeName, int dailyGoal, int totalDrank, int curren
     text += "---------------------\n";
     text += "Level: " + String(currentLevel) + " mL";
 
-    text += "\n---------------------\n"; //TODO: Check the amount of new lines needed to this appears at the bottom
+    text += "\n---------------------\n";
     text += _getWifiText();
     print(text);
 }
@@ -65,7 +65,7 @@ void Screen::showModeMenu(String modeName, int dailyGoal) {
     text += modeName + " Mode\n";
     text += "(" + String(dailyGoal / 1000.0, 1) + " Liters)";
 
-    text += "\n\n\n---------------------\n"; //TODO: Check the amount of new lines needed to this appears at the bottom
+    text += "\n\n\n---------------------\n";
     text += _getWifiText();
     print(text);
 }
