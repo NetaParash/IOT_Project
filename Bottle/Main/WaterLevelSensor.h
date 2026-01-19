@@ -15,7 +15,8 @@ private:
     touch_pad_t _touchPadIndex;
 
     // Thresholds:
-    int thresh_wet;
+    int thresh_wet_low;
+    int thresh_wet_high;
     int thresh_mid_low;
     int thresh_mid_high;
 
@@ -24,8 +25,8 @@ private:
     bool _isTopHalf;   // Is water in the upper 50% of this pad?
 
 public:
-    WaterProbe(uint8_t pin, int wet, int mid_low, int mid_high) : _pin(pin), _isWet(false),
-    _isTopHalf(false), thresh_wet(wet), thresh_mid_low(mid_low), thresh_mid_high(mid_high) {
+    WaterProbe(uint8_t pin, int wet_low, int wet_high, int mid_low, int mid_high) : _pin(pin), _isWet(false),
+    _isTopHalf(false), thresh_wet_low(wet_low), thresh_wet_high(wet_high), thresh_mid_low(mid_low), thresh_mid_high(mid_high) {
         _touchPadIndex = (touch_pad_t) digitalPinToTouchChannel(pin);
     }
 
@@ -39,9 +40,9 @@ public:
         touch_pad_read_filtered(_touchPadIndex, &val);
 
         // --- Detect Wet/Dry ---
-        if (!_isWet && val < thresh_wet) {
+        if (!_isWet && val < thresh_wet_low) {
             _isWet = true;
-        } else if (_isWet && val > thresh_wet) {
+        } else if (_isWet && val > thresh_wet_high) {
             _isWet = false;
             _isTopHalf = false; // Reset half state if dry
         }
@@ -76,7 +77,7 @@ private:
 public:
     WaterLevelSensor(std::vector<int> pins, std::vector<std::vector<int>> thresholds) {
         for (int i=0; i<pins.size(); i++) {
-            _probes.push_back(WaterProbe(pins[i], thresholds[i][0], thresholds[i][1], thresholds[i][2]));
+            _probes.push_back(WaterProbe(pins[i], thresholds[i][0], thresholds[i][1], thresholds[i][2], thresholds[i][3]));
         }
     }
 
