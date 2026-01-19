@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
-import { CircularProgress, Box } from "@mui/material";
+import { Box } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import config from "../config";
 import { useAppContext } from "../AppContext";
 import { ChartsReferenceLine } from "@mui/x-charts/ChartsReferenceLine";
@@ -56,11 +57,25 @@ export default function DrinkingAmountGraph() {
     }, [selectedBottleId]); // 🔥 bottle-aware
 
     if (!selectedBottleId) {
-        return <CircularProgress size={24} />;
+        return (
+            <Typography
+                variant="h6"
+                sx={{ textAlign: "center", mt: 2, color: "text.secondary" }}
+            >
+                Please choose a student
+            </Typography>
+        );
     }
 
     if (points.length === 0) {
-        return <CircularProgress size={24} />;
+        return (
+            <Typography
+                variant="h2"
+                sx={{ textAlign: "center", mt: 2, color: "text.secondary" }}
+            >
+                No data so far
+            </Typography>
+        );
     }
 
     return (
