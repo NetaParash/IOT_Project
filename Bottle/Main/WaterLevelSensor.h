@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include <vector>
 #include <driver/touch_pad.h>
+#include "Parameters.h"
 
 // ==========================================
 // CLASS: WaterProbe (logic for a single touch pad for detecting if it touches water)

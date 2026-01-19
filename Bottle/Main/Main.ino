@@ -7,38 +7,16 @@
  #include "BottleMode.h"
  #include <deque>
  #include "AppClient.h"
+ #include "Parameters.h"
 
  using namespace std;
 
  // ========================
- // MODES
- // ========================
- #define MODE_COUNT 4
-
- static const BottleMode modes[MODE_COUNT] = {
-         BottleMode("hydration", 2500, 60),
-         BottleMode("sport",     3500, 30),
-         BottleMode("office",    2000, 90),
-         BottleMode("night",     500,  0)
- };
-
- // Initialize with mode HYDRATION (index 0)
- BottleMode currentMode(modes[0].name, modes[0].dailyGoal, modes[0].alertEveryMinutes);
-
-int bottleId = 1;
- // ========================
  // APPLICATION
  // ========================
-AppClient appClient(
-    "2Caesars", //"OrZ iPhone",
-    "14121998", //"g0iibm9ik7ry",
-    "https://iot-project-6i3k.onrender.com", bottleId
-);
+AppClient appClient(WIFI_NAME, WIFI_PASSWORD, APP_URL, BOTTLE_ID);
 
-const unsigned long SETTINGS_PULL_INTERVAL_MS = (30 * 1000); // 30 seconds
 unsigned long lastSettingsPullMs = 0;
-
-const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (30 * 1000); // 30 seconds
 unsigned long lastWaterSendEventMs = 0;
 
  // ========================
@@ -83,8 +61,6 @@ vector<vector<int>> thresholds = {
  // ========================
  unsigned long lastWaterCheck = 0;
  unsigned long lastNotificationTime = 0;
- const unsigned long WATER_INTERVAL_MS = 100;
- const unsigned long SCREEN_REFRESH_RATE_MS = 150;
 
  // ========================
  // MENU STATE
@@ -104,7 +80,6 @@ vector<vector<int>> thresholds = {
  int totalDrankML = 0;
  deque<int> lastWaterLevel;
  int waterML = 0;
- const int BOTTLE_ML = 500;
 
  void setup() {
      Serial.begin(115200);
@@ -122,7 +97,6 @@ vector<vector<int>> thresholds = {
      gyro.setup();
      waterLevelSensor.setup();
      lastNotificationTime = millis();
-
 
      screen.print("Pulling drinking data from application");
      totalDrankML = appClient.getLastTotalDrank();
@@ -214,8 +188,8 @@ vector<vector<int>> thresholds = {
      if (currentMode.alertEveryMinutes > 0) {
          if (now - lastNotificationTime >= currentMode.getAlertIntervalMs()) {
              // Notify
-             lights.blinkNotification();
              screen.print("Time to drink!");
+             lights.blinkNotification();
              // Reset timer
              lastNotificationTime = now;
          }
@@ -237,7 +211,7 @@ vector<vector<int>> thresholds = {
              waterML = (levelPercent * BOTTLE_ML) / 100;
 
              lastWaterLevel.push_back(waterML);
-             if (lastWaterLevel.size() == 20) {
+             if (lastWaterLevel.size() == SLIDING_WINDOW_SIZE) {
                  int all = lastWaterLevel.front();
                  bool consistent = true;
 
