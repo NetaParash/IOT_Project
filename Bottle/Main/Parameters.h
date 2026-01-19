@@ -27,5 +27,6 @@ const char* APP_URL = "https://iot-project-6i3k.onrender.com";
 // BOTTLE PROPERTIES
 // ========================
 const int BOTTLE_ML = 500;
+int BOTTLE_ID = 1;
 
 #endif //IOT_PROJECT_DEFINITIONS_H

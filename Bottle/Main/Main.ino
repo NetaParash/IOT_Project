@@ -11,11 +11,10 @@
 
  using namespace std;
 
- int bottleId = 1;
  // ========================
  // APPLICATION
  // ========================
-AppClient appClient(WIFI_NAME, WIFI_PASSWORD, APP_URL);
+AppClient appClient(WIFI_NAME, WIFI_PASSWORD, APP_URL, BOTTLE_ID);
 
 unsigned long lastSettingsPullMs = 0;
 unsigned long lastWaterSendEventMs = 0;
