@@ -34,7 +34,7 @@ export default function DashboardPage() {
                         subtitle={`Today drank - ${drankToday} ml`}
                     >
                         <Typography variant="h1">
-                            {Math.round((drankToday * 100) / goal)} %
+                            {Math.floor((drankToday * 100) / goal)} %
                         </Typography>
                     </DashboardCard>
                 </Grid>

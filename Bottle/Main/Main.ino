@@ -4,7 +4,6 @@
  #include "GyroSensor.h"
  #include "ButtonInput.h"
  #include "LightNotifier.h"
- #include "TestAppClient.h"
  #include "BottleMode.h"
  #include <deque>
  #include "AppClient.h"
@@ -12,6 +11,7 @@
 
  using namespace std;
 
+ int bottleId = 1;
  // ========================
  // APPLICATION
  // ========================
@@ -98,8 +98,6 @@ vector<vector<int>> thresholds = {
      gyro.setup();
      waterLevelSensor.setup();
      lastNotificationTime = millis();
-
-     testAppClientDrainBottle();
 
      screen.print("Pulling drinking data from application");
      totalDrankML = appClient.getLastTotalDrank();

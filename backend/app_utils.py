@@ -20,7 +20,7 @@ def get_today_drink_history(bottle_id: int):
             "y": e["amount_drank_ml"],
         }
         for e in events
-        if e.get("amount_drank_ml", 0) > 0 and e["ts"] >= today_start
+        if e["ts"] >= today_start
     ]
     return chart_points
 

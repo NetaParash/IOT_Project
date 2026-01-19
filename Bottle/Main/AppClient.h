@@ -18,10 +18,12 @@ public:
        ======================== */
     AppClient(const char* ssid,
               const char* password,
-              const char* backendDomain)
+              const char* backendDomain,
+              int bottleId)
         : _ssid(ssid),
           _password(password),
-          _backend(backendDomain) {
+          _backend(backendDomain),
+          _bottleId(bottleId)  {
         isConnectedToWIFI = false;
     }
 
@@ -81,7 +83,7 @@ public:
         client.setInsecure();
 
         HTTPClient https;
-        String url = _backend + "/api/bottle/settings";
+        String url = _backend + "/api/bottle/" + String(_bottleId) + "/settings";
 
         Serial.print("[HTTP] POST ");
         Serial.println(url);
@@ -132,7 +134,7 @@ public:
         client.setInsecure();
 
         HTTPClient https;
-        String url = _backend + "/api/bottle/settings";
+        String url = _backend + "/api/bottle/" + String(_bottleId) + "/settings";
 
         Serial.print("[HTTP] GET ");
         Serial.println(url);
@@ -177,7 +179,7 @@ public:
         client.setInsecure();
 
         HTTPClient https;
-        String url = _backend + "/api/app/total-drank-today";
+        String url = _backend + "/api/app/" + String(_bottleId) + "/total-drank-today";
 
         Serial.print("[HTTP] GET ");
         Serial.println(url);
@@ -225,7 +227,7 @@ public:
         client.setInsecure();
 
         HTTPClient https;
-        String url = _backend + "/api/bottle/events";
+        String url = _backend + "/api/bottle/" + String(_bottleId) + "/events";
 
         Serial.print("[HTTP] POST ");
         Serial.println(url);
@@ -271,7 +273,7 @@ bool clearEventData() {
     client.setInsecure();
 
     HTTPClient https;
-    String url = _backend + "/api/app/clear-event-data";
+        String url = _backend + "/api/app/" + String(_bottleId) + "/clear-event-data";
 
     Serial.print("[HTTP] POST ");
     Serial.println(url);
@@ -299,6 +301,8 @@ private:
     const char* _ssid;
     const char* _password;
     String _backend;
+    int _bottleId;
+
 };
 
 #endif

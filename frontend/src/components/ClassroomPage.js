@@ -30,7 +30,7 @@ export default function ClassroomPage() {
 
                 const percent =
                     goal > 0
-                        ? Math.min(100, Math.round((drank / goal) * 100))
+                        ? Math.min(100, Math.floor((drank / goal) * 100))
                         : 0;
 
                 return { bottleId, percent };
