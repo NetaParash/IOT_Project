@@ -231,7 +231,6 @@ vector<vector<int>> thresholds = {
                  if (consistent) {
                      if (lastStableLevel > all) {
                         totalDrankML += (lastStableLevel - all);
-                        totalDrankML += 100;
                         prefs.putInt("total", totalDrankML);   // save updated value
 
                      }
