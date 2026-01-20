@@ -66,7 +66,6 @@ vector<vector<int>> thresholds = {
  // ========================
  // NON - VOLATILE VARIABLES
  // ========================
-
  Preferences prefs;
 
  // ========================
