@@ -93,7 +93,7 @@ public:
         Serial.println("Touch Pads Initialized.");
     }
 
-    int getWaterLevel() {
+    float getWaterLevel() {
         // Update state of all probes
         for (auto& probe : _probes) {
             probe.update();
@@ -131,7 +131,7 @@ public:
         return _calculatePercentage(score);
     }
 
-    int _calculatePercentage(int score) {
+    float _calculatePercentage(int score) {
         int maxScore = _probes.size() * 2;
         int percent = (score * 100) / maxScore;
 
