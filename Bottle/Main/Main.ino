@@ -108,8 +108,8 @@ vector<vector<int>> thresholds = {
      waterLevelSensor.setup();
      lastNotificationTime = millis();
 
-     screen.print("Pulling drinking data from application");
-     // totalDrankML = appClient.getLastTotalDrank();
+     screen.print("Trying to connect to WIFI...");
+     appClient.connectWiFi();
 
      screen.print("System Ready");
  }
@@ -218,7 +218,7 @@ vector<vector<int>> thresholds = {
              lastWaterCheck = now;
 
              float levelPercent = waterLevelSensor.getWaterLevel();
-             waterML = (levelPercent * BOTTLE_ML) / 100;
+             waterML = (levelPercent * float(BOTTLE_ML)) / 100;
 
              lastWaterLevel.push_back(waterML);
              if (lastWaterLevel.size() == SLIDING_WINDOW_SIZE) {

@@ -133,7 +133,7 @@ public:
 
     float _calculatePercentage(int score) {
         int maxScore = _probes.size() * 2;
-        int percent = (score * 100) / maxScore;
+        float percent = float(score * 100) / maxScore;
 
         Serial.print("Score: "); Serial.print(score);
         Serial.print("/"); Serial.print(maxScore);
