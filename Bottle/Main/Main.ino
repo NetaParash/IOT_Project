@@ -67,7 +67,8 @@ vector<vector<int>> thresholds = {
  // ========================
  enum MenuState {
      STATE_HOME,
-     STATE_SELECT_MODE // Generic state for browsing any mode
+     STATE_SELECT_MODE, // Generic state for browsing any mode
+     STATE_RESET_DATA
  };
 
  MenuState currentScreen = STATE_HOME;
@@ -175,8 +176,21 @@ vector<vector<int>> thresholds = {
              else if (btnNext.wasPressed()) {
                  browsingModeIndex++;
                  if (browsingModeIndex >= MODE_COUNT) {
-                     currentScreen = STATE_HOME;
+                     currentScreen = STATE_RESET_DATA;
                  }
+             }
+             break;
+
+         case STATE_RESET_DATA:
+             if (btnNext.wasPressed()) {
+                 currentScreen = STATE_HOME;
+             }
+             else if (btnSelect.wasPressed()) {
+                 Serial.println("[MAIN] Clearing Water Data");
+                 appClient.clearEventData();
+                 totalDrankML = 0;
+
+                 currentScreen = STATE_HOME;
              }
              break;
      }
@@ -257,6 +271,11 @@ vector<vector<int>> thresholds = {
                      String selectModeName = modes[browsingModeIndex].name;
                      int selectModeGoal = modes[browsingModeIndex].dailyGoal;
                      screen.showModeMenu(selectModeName, selectModeGoal);
+                     break;
+                 }
+
+                 case STATE_RESET_DATA: {
+                     screen.showResetScreen();
                      break;
                  }
              }

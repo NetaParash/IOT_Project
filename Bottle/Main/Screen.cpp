@@ -69,3 +69,11 @@ void Screen::showModeMenu(String modeName, int dailyGoal) {
     text += _getWifiText();
     print(text);
 }
+
+void Screen::showResetScreen() {
+    String text = "Press Select\nto reset the bottle";
+
+    text += "\n\n\n\n---------------------\n";
+    text += _getWifiText();
+    print(text);
+}
