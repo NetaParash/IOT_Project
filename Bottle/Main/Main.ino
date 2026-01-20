@@ -8,6 +8,7 @@
  #include <deque>
  #include "AppClient.h"
  #include "Parameters.h"
+#include <Preferences.h>
 
  using namespace std;
 
@@ -63,12 +64,17 @@ vector<vector<int>> thresholds = {
  unsigned long lastNotificationTime = 0;
 
  // ========================
+ // NON - VOLATILE VARIABLES
+ // ========================
+
+ Preferences prefs;
+
+ // ========================
  // MENU STATE
  // ========================
  enum MenuState {
      STATE_HOME,
-     STATE_SELECT_MODE, // Generic state for browsing any mode
-     STATE_RESET_DATA
+     STATE_SELECT_MODE // Generic state for browsing any mode
  };
 
  MenuState currentScreen = STATE_HOME;
@@ -83,14 +89,17 @@ vector<vector<int>> thresholds = {
  int waterML = 0;
 
  void setup() {
-     Serial.begin(115200);
-     delay(500);
+    Serial.begin(115200);
+    delay(500);
 
-     Wire.begin(21, 22);
+    Wire.begin(21, 22);
 
-     screen.setup();
-     screen.attachAppClient(&appClient);
-     screen.print("Initializing...");
+    screen.setup();
+    screen.attachAppClient(&appClient);
+    screen.print("Initializing...");
+
+    prefs.begin("bottle", false);               
+    totalDrankML = prefs.getInt("total", 0);    
 
      lights.setup();
      btnNext.setup();
@@ -100,7 +109,7 @@ vector<vector<int>> thresholds = {
      lastNotificationTime = millis();
 
      screen.print("Pulling drinking data from application");
-     totalDrankML = appClient.getLastTotalDrank();
+     // totalDrankML = appClient.getLastTotalDrank();
 
      screen.print("System Ready");
  }
@@ -176,21 +185,8 @@ vector<vector<int>> thresholds = {
              else if (btnNext.wasPressed()) {
                  browsingModeIndex++;
                  if (browsingModeIndex >= MODE_COUNT) {
-                     currentScreen = STATE_RESET_DATA;
+                     currentScreen = STATE_HOME;
                  }
-             }
-             break;
-
-         case STATE_RESET_DATA:
-             if (btnNext.wasPressed()) {
-                 currentScreen = STATE_HOME;
-             }
-             else if (btnSelect.wasPressed()) {
-                 Serial.println("[MAIN] Clearing Water Data");
-                 appClient.clearEventData();
-                 totalDrankML = 0;
-
-                 currentScreen = STATE_HOME;
              }
              break;
      }
@@ -234,7 +230,10 @@ vector<vector<int>> thresholds = {
                  }
                  if (consistent) {
                      if (lastStableLevel > all) {
-                         totalDrankML += (lastStableLevel - all);
+                        totalDrankML += (lastStableLevel - all);
+                        totalDrankML += 100;
+                        prefs.putInt("total", totalDrankML);   // save updated value
+
                      }
                      lastStableLevel = all;
                  }
@@ -271,11 +270,6 @@ vector<vector<int>> thresholds = {
                      String selectModeName = modes[browsingModeIndex].name;
                      int selectModeGoal = modes[browsingModeIndex].dailyGoal;
                      screen.showModeMenu(selectModeName, selectModeGoal);
-                     break;
-                 }
-
-                 case STATE_RESET_DATA: {
-                     screen.showResetScreen();
                      break;
                  }
              }
