@@ -217,7 +217,7 @@ vector<vector<int>> thresholds = {
          if (now - lastWaterCheck >= WATER_INTERVAL_MS) {
              lastWaterCheck = now;
 
-             int levelPercent = waterLevelSensor.getWaterLevel();
+             float levelPercent = waterLevelSensor.getWaterLevel();
              waterML = (levelPercent * BOTTLE_ML) / 100;
 
              lastWaterLevel.push_back(waterML);
