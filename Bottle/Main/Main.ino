@@ -66,16 +66,16 @@ vector<vector<int>> thresholds = {
  // ========================
  // NON - VOLATILE VARIABLES
  // ========================
-
  Preferences prefs;
 
- // ========================
- // MENU STATE
- // ========================
- enum MenuState {
-     STATE_HOME,
-     STATE_SELECT_MODE // Generic state for browsing any mode
- };
+// ========================
+// MENU STATE
+// ========================
+enum MenuState {
+    STATE_HOME,
+    STATE_SELECT_MODE, // Generic state for browsing any mode
+    STATE_RESET_DATA
+};
 
  MenuState currentScreen = STATE_HOME;
  int browsingModeIndex = 0; // Index to track which mode we are currently looking at in the menu
@@ -98,8 +98,8 @@ vector<vector<int>> thresholds = {
     screen.attachAppClient(&appClient);
     screen.print("Initializing...");
 
-    prefs.begin("bottle", false);               
-    totalDrankML = prefs.getInt("total", 0);    
+     prefs.begin("bottle", false);
+     totalDrankML = prefs.getInt("total", 0);
 
      lights.setup();
      btnNext.setup();
@@ -108,8 +108,8 @@ vector<vector<int>> thresholds = {
      waterLevelSensor.setup();
      lastNotificationTime = millis();
 
-     screen.print("Pulling drinking data from application");
-     // totalDrankML = appClient.getLastTotalDrank();
+     screen.print("Trying to connect to WIFI...");
+     appClient.connectWiFi();
 
      screen.print("System Ready");
  }
@@ -185,8 +185,21 @@ vector<vector<int>> thresholds = {
              else if (btnNext.wasPressed()) {
                  browsingModeIndex++;
                  if (browsingModeIndex >= MODE_COUNT) {
-                     currentScreen = STATE_HOME;
+                     currentScreen = STATE_RESET_DATA;
                  }
+             }
+             break;
+
+         case STATE_RESET_DATA:
+             if (btnNext.wasPressed()) {
+                 currentScreen = STATE_HOME;
+             }
+             else if (btnSelect.wasPressed()) {
+                 Serial.println("[MAIN] Clearing Water Data");
+                 appClient.clearEventData();
+                 totalDrankML = 0;
+
+                 currentScreen = STATE_HOME;
              }
              break;
      }
@@ -217,8 +230,8 @@ vector<vector<int>> thresholds = {
          if (now - lastWaterCheck >= WATER_INTERVAL_MS) {
              lastWaterCheck = now;
 
-             int levelPercent = waterLevelSensor.getWaterLevel();
-             waterML = (levelPercent * BOTTLE_ML) / 100;
+             float levelPercent = waterLevelSensor.getWaterLevel();
+             waterML = (levelPercent * float(BOTTLE_ML)) / 100;
 
              lastWaterLevel.push_back(waterML);
              if (lastWaterLevel.size() == SLIDING_WINDOW_SIZE) {
@@ -231,7 +244,6 @@ vector<vector<int>> thresholds = {
                  if (consistent) {
                      if (lastStableLevel > all) {
                         totalDrankML += (lastStableLevel - all);
-                        totalDrankML += 100;
                         prefs.putInt("total", totalDrankML);   // save updated value
 
                      }
@@ -270,6 +282,11 @@ vector<vector<int>> thresholds = {
                      String selectModeName = modes[browsingModeIndex].name;
                      int selectModeGoal = modes[browsingModeIndex].dailyGoal;
                      screen.showModeMenu(selectModeName, selectModeGoal);
+                     break;
+                 }
+
+                 case STATE_RESET_DATA: {
+                     screen.showResetScreen();
                      break;
                  }
              }
