@@ -32,10 +32,10 @@ export default function BottleDropdown() {
             sx={{
                 width: 350,
                 mb: 3,
-                mt: 1,
+                mt: 3,
                 "& .MuiInputBase-root": {
-                    height: 48,
-                    fontSize: 20,
+                    height: 64,
+                    fontSize: 30,
                 },
                 "& .MuiInputLabel-root": {
                     fontSize: 18,
@@ -46,7 +46,7 @@ export default function BottleDropdown() {
                 <TextField
                     {...params}
                     label="Select Bottle"
-                    size="medium"
+                    size="large"
                 />
             )}
         />
