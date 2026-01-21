@@ -56,7 +56,6 @@ export default function TopAppBar() {
                 {/* Title */}
                 <Typography variant="h1" sx={{ flexGrow: 1 }}>
                     Smart Bottle – {currentTitle}
-                    {selectedBottleName && ` – ${selectedBottleName}`}
                 </Typography>
 
                 {/* Logo */}
