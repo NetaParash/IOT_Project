@@ -1,70 +1,225 @@
-# Getting Started with Create React App
+# Smart Bottle – Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This directory contains the **React-based frontend** for the **Smart Bottle IoT Project**, developed as part of an academic IoT system that monitors water consumption, tracks hydration progress, and provides real-time visualization for students or users.
 
-## Available Scripts
+The frontend communicates with a backend service using REST APIs and displays data such as water level, drinking history, daily goals, and customizable settings.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Table of Contents
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Installation & Running](#installation--running)
+4. [Project Structure](#project-structure)
+5. [Configuration](#configuration)
+6. [User Interface Documentation](#user-interface-documentation)
+7. [System Modes & Statuses](#system-modes--statuses)
+8. [Configurable Parameters](#configurable-parameters)
+9. [Error Messages](#error-messages)
+10. [Calibration Instructions](#calibration-instructions)
+11. [Performance Tests](#performance-tests)
+12. [Libraries & Versions](#libraries--versions)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+##  Overview
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The **Smart Bottle Frontend** is a single-page application built with **React**.  
+It displays hydration data sent from IoT devices (“Smart Bottles”) used by individual students or users.
 
-### `npm run build`
+Main capabilities include:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Real-time water-level monitoring
+- Drinking-history graphs
+- Daily hydration statistics
+- Classroom view (monitor all bottles simultaneously)
+- Configurable reminders and daily goals
+- Settings page with predefined hydration modes
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+This folder contains *only the client side* of the system.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+##  Features
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **Live dashboard** with automatic polling
+- **SVG water bottle** with animated fill
+- **Time-series graph** of drinking events
+- **Classroom overview** of all bottles
+- **Settings page** with multiple modes
+- **Mock event generator** for testing
+- Fully responsive layout using **Material UI**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+##  Installation & Running
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 1. Install dependencies
+```bash
+npm install
+```
+### 2. Start development server
+```bash
+npm start
+```
 
-## Learn More
+Application runs at:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+http://localhost:3000/
+### 3. Build for production
+```bash
+npm run build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Project Structure
+```
+frontend/
+│
+├── App.js
+├── AppContext.js
+├── config.js
+├── PagesConfig.js
+├── theme.js
+│
+├── components/
+│   ├── BottleDropdown.js
+│   ├── DashboardCard.jsx
+│   ├── DrinkingAmountGraph.jsx
+│   ├── WaterLevel.jsx
+│   ├── WaterLevelClassroomDashboard.js
+│   ├── SettingsPage.js
+│   ├── ClassroomPage.js
+│   ├── DashboardPage.js
+│   ├── WelcomePage.js
+│   ├── SideDrawer.js
+│   └── TopAppBar.js
+│
+├── dev.json
+└── prod.json
+```
 
-### Code Splitting
+# Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Configuration files are located in:
 
-### Analyzing the Bundle Size
+- `config.js`
+- `dev.json`
+- `prod.json`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The active configuration is selected using the environment variable:
 
-### Making a Progressive Web App
+```
+REACT_APP_ENVIRONMENT=dev | prod
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Example Fields
 
-### Advanced Configuration
+| Field | Description |
+|-------|-------------|
+| `API_BASE_URL` | URL of backend API |
+| `FRONTEND_PORT` | Port used by the React app |
+| `API_PORT` | Backend port |
+| `API_KEY` | Optional key (unused in dev) |
+| Endpoint names | Routes used to build API calls |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+#  User Interface Documentation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Welcome Page
+- Project logo
+- **Generate Mock Events** button
+- **Delete Data** button (for bottle 1)
 
-### `npm run build` fails to minify
+## Dashboard Page
+- Bottle selector (dropdown)
+- Animated water bottle SVG
+- Daily goal display
+- Drinking progress (%)
+- Drinking history graph
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Classroom Page
+Displays **all bottles** simultaneously, each card showing:
+- Student name
+- Progress percentage
+- Mini water bottle visualization
+
+## Settings Page
+- Preset modes: **Hydration, Sport, Office, Night**
+- Custom mode with manual configuration
+- Saves changes via POST request
+
+## Side Drawer Navigation
+Pages:
+- Welcome
+- Dashboard
+- Stats
+- Settings
+
+---
+
+#  System Modes & Statuses
+
+## Hydration Modes
+
+| Mode | Goal (ml/day) | Interval | Description |
+|------|---------------|----------|-------------|
+| **Hydration** | 2500 | 60 min | Balanced intake |
+| **Sport** | 3500 | 30 min | High activity |
+| **Office** | 2000 | 90 min | Low reminders |
+| **Night** | 500 | 0 | Minimal reminders |
+| **Custom** | User-defined | User-defined | Manual mode |
+
+---
+
+# ️ Configurable Parameters
+
+## Via UI
+- `mode`
+- `goal` (0–5000 ml)
+- `alertsEvery` (0–180 minutes)
+- Selected bottle ID
+
+## Via Config File
+- `API_BASE_URL`
+- Backend endpoints
+- Environment selection
+
+## Via Code
+- Polling interval
+- Graph refresh speed
+- Bottle capacity (`500 ml`)
+
+---
+
+# ️ Error Messages
+
+## User-visible
+- “Please choose a student”
+- “No data so far”
+- Errors when generating or deleting data
+
+## Console (dev tools)
+- `Polling failed`
+- `Failed to load drink amount graph`
+- `Settings save failed`
+
+> These indicate backend issues but do **not** break the UI.
+
+---
+
+#  Calibration Instructions
+
+The frontend requires **no calibration**, but the water fill animation assumes:
+
+```
+BOTTLE_CAPACITY_ML = 500
+```
+
+Located in:
+```
+WaterLevel.jsx
+```
+
+Update this value if using bottles with different capacity.
