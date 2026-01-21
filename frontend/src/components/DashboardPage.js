@@ -14,7 +14,7 @@ export default function DashboardPage() {
             {/* ===== Row 1 ===== */}
             <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
-                    <DashboardCard title="Water Level" subtitle="Current">
+                    <DashboardCard title="Water Level" subtitle="Bottle capacity: 500ml">
                         <WaterLevel />
                     </DashboardCard>
                 </Grid>
