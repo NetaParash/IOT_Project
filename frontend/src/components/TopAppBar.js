@@ -50,7 +50,7 @@ export default function TopAppBar() {
                     aria-label={isDrawerOpen ? "close menu" : "open menu"}
                     onClick={toggleDrawer}
                 >
-                    {isDrawerOpen ? <CloseIcon /> : <DehazeOutlinedIcon />}
+                    {isDrawerOpen ? <CloseIcon sx={{ fontSize: 35 }}/> : <DehazeOutlinedIcon sx={{ fontSize: 35 }} />}
                 </IconButton>
 
                 {/* Title */}
