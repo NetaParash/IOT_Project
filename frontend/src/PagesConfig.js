@@ -1,5 +1,5 @@
 import {Home} from '@mui/icons-material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import GroupsIcon from '@mui/icons-material/Groups';
 import SettingsIcon from '@mui/icons-material/Settings';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 
@@ -13,24 +13,24 @@ export const appPages = [
         name: "Welcome",
         path: "/",
         component: <WelcomePage/>,
-        icon: () => <Home/>,
+        icon: () => <Home sx={{ fontSize: 35 }}/>,
     }
     , {
-        name: "Dashboard",
-        path: "/dashboard",
+        name: "Classroom",
+        path: "/Classroom",
         component: <ClassroomPage/>,
-        icon: () => <DashboardIcon/>,
+        icon: () => <GroupsIcon sx={{ fontSize: 35 }}/>,
     },
     {
         name: "Stats",
         path: "/stats",
         component: <DashboardPage/>,
-        icon: () => <QueryStatsIcon/>,
+        icon: () => <QueryStatsIcon sx={{ fontSize: 35 }}/>,
     },
     {
         name: "Settings",
         path: "/settings",
         component: <SettingsPage/>,
-        icon: () => <SettingsIcon/>,
+        icon: () => <SettingsIcon sx={{ fontSize: 35 }}/>,
     }
 ];

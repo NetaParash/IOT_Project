@@ -11,12 +11,29 @@ import config from "./config";
 const AppContext = createContext(null);
 const POLL_INTERVAL_MS = 30_000;
 
-const NAMES = [
-    "Liat", "Neta", "Or", "Tom", "Lama",
-    "Itay", "Avigail", "Wesam", "Ilay", "Ido",
-    "Noa", "Daniel", "Alon", "Eden", "Tomer",
-    "Noga", "Omer", "Rotem", "Gal", "Yuval"
-];
+const NAMES_BY_ID = {
+    1: null,
+    2: "Neta",
+    3: "Or",
+    4: "Tom",
+    5: "Lama",
+    6: "Itay",
+    7: "Avigail",
+    8: "Wesam",
+    9: "Ilay",
+    10: "Ido",
+    11: "Noa",
+    12: "Daniel",
+    13: "Alon",
+    14: "Eden",
+    15: "Tomer",
+    16: "Noga",
+    17: "Omer",
+    18: "Rotem",
+    19: "Gal",
+    20: "Yuval"
+};
+
 
 export const AppProvider = ({ children }) => {
     // ----- Global state -----
@@ -27,12 +44,37 @@ export const AppProvider = ({ children }) => {
     const [selectedBottleId, setSelectedBottleId] = useState(null);
 
     // Bottle list (id + name)
-    const [bottles] = useState(
-        NAMES.map((name, index) => ({
-            id: index + 1,
-            name
-        }))
-    );
+    const [bottles, setBottles] = useState(() => {
+        const saved = localStorage.getItem("bottles");
+        if (saved) return JSON.parse(saved);
+
+        return Object.entries(NAMES_BY_ID).map(([id, name]) => ({
+            id: Number(id),
+            name: name ?? `Bottle ${id}`
+        }));
+    });
+    useEffect(() => {
+        localStorage.setItem("bottles", JSON.stringify(bottles));
+    }, [bottles]);
+
+    const updateBottleName = (id, newName) => {
+        setBottles(prev =>
+            prev.map(b => b.id === id ? { ...b, name: newName } : b)
+        );
+    };
+
+    const addBottle = (name) => {
+        setBottles(prev => {
+            const maxId = prev.length === 0 ? 0 : Math.max(...prev.map(b => b.id));
+            const newBottle = {
+                id: maxId + 1,
+                name: name ?? null
+            };
+            return [...prev, newBottle];
+        });
+    };
+
+
 
     const [mode, setMode] = useState(null);
     const [goal, setGoal] = useState(0);
@@ -96,7 +138,10 @@ export const AppProvider = ({ children }) => {
 
             selectedBottleId,
             setSelectedBottleId,
+
             bottles,
+            updateBottleName,
+            addBottle,
 
             isDrawerOpen,
             toggleDrawer,
@@ -108,6 +153,7 @@ export const AppProvider = ({ children }) => {
             goal,
             alertsEvery,
             selectedBottleId,
+            bottles,
             isDrawerOpen
         ]
     );
