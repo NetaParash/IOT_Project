@@ -28,8 +28,4 @@ static const BottleMode modes[MODE_COUNT] = {
         BottleMode("night",     500,  0)
 };
 
-// Initialize with mode HYDRATION (index 0)
-BottleMode currentMode(modes[0].name, modes[0].dailyGoal, modes[0].alertEveryMinutes);
-
-
 #endif

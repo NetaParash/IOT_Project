@@ -88,6 +88,12 @@ enum MenuState {
  deque<int> lastWaterLevel;
  int waterML = 0;
 
+ // ========================
+ // CURRENT MODE
+ // ========================
+ // Initialize with mode HYDRATION (index 0)
+ BottleMode currentMode(modes[0].name, modes[0].dailyGoal, modes[0].alertEveryMinutes);
+
  void setup() {
     Serial.begin(115200);
     delay(500);
@@ -109,7 +115,12 @@ enum MenuState {
      lastNotificationTime = millis();
 
      screen.print("Trying to connect to WIFI...");
-     appClient.connectWiFi();
+     auto settings = appClient.getSettings();
+     if (settings.size() == 3) {
+         currentMode.name = settings[0];
+         currentMode.dailyGoal = settings[1].toInt();
+         currentMode.alertEveryMinutes = settings[2].toInt();
+     }
 
      screen.print("System Ready");
  }
@@ -145,7 +156,6 @@ enum MenuState {
             Serial.println(currentMode.dailyGoal);
             Serial.print("  alerts_every: ");
             Serial.println(currentMode.alertEveryMinutes);
-
             
         } else {
             Serial.println("[MAIN] Failed to fetch settings");
@@ -198,6 +208,7 @@ enum MenuState {
                  Serial.println("[MAIN] Clearing Water Data");
                  appClient.clearEventData();
                  totalDrankML = 0;
+                 prefs.putInt("total", totalDrankML);
 
                  currentScreen = STATE_HOME;
              }

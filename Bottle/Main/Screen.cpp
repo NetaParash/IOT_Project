@@ -28,7 +28,7 @@ String Screen::_getWifiText() {
     }
 
     if (_appClient->isConnectedToWIFI) {
-        return "Connected to WIFI: " + String(_appClient->getSSID());
+        return "WIFI: " + String(_appClient->getSSID());
     }
     else {
         return "Not connected to WIFI";

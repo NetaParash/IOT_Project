@@ -19,8 +19,8 @@ const int SLIDING_WINDOW_SIZE = 20;
 // ========================
 // WIFI
 // ========================
-const char* WIFI_NAME = "Pura Vida";
-const char* WIFI_PASSWORD = "L&Y26100612";
+const char* WIFI_NAME = "OrZ iPhone";
+const char* WIFI_PASSWORD = "g0iibm9ik7ry";
 const char* APP_URL = "https://iot-project-6i3k.onrender.com";
 
 // ========================
