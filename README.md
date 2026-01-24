@@ -4,11 +4,11 @@ Many students do not drink enough water during the school day, and teachers lack
 
 ## Key Features
 
-* [cite_start]**Real-time Tracking:** Automatically calculates the amount of water consumed.
-* [cite_start]**Smart Stability Detection:** Uses a gyroscope to ensure measurements are only taken when the bottle is stable to prevent errors.
-* [cite_start]**Cloud Connectivity:** Syncs hydration data and settings with a backend server via Wi-Fi.
-* [cite_start]**Visual Feedback:** An OLED screen displays current status, and an RGB LED provides visual alerts for drinking reminders.
-* [cite_start]**Customizable Modes:** Different modes (e.g., Hydration, Sport, Office) for daily goal and alerts, configurable via the device menu or the app. A custom mode is also available via the app.
+* **Real-time Tracking:** Automatically calculates the amount of water consumed.
+* **Smart Stability Detection:** Uses a gyroscope to ensure measurements are only taken when the bottle is stable to prevent errors.
+* **Cloud Connectivity:** Syncs hydration data and settings with a backend server via Wi-Fi.
+* **Visual Feedback:** An OLED screen displays current status, and an RGB LED provides visual alerts for drinking reminders.
+* **Customizable Modes:** Different modes (e.g., Hydration, Sport, Office) for daily goal and alerts, configurable via the device menu or the app. A custom mode is also available via the app.
 
 
 
