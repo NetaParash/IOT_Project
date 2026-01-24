@@ -57,6 +57,20 @@ The project is written in C++ (Arduino framework) and consists of the following 
 * **`Screen.h` / `Screen.cpp`**: Controls the **OLED display**. It renders the home dashboard, menus, and Wi-Fi status indicator.
 * **`LightNotifier.h`**: Controls the **NeoPixel**. It manages visual alerts (blinking blue lights) to remind the user to drink based on the time interval defined in the current mode.
 
+### Libraries & Dependencies
+The following libraries were used in this project.
+*Note: Please verify the specific installed versions in your environment (Arduino IDE: Tools -> Manage Libraries).*
+
+* **ArduinoJson** by Benoit Blanchon [v7.4.2]
+* **Adafruit GFX Library** by Adafruit [v1.12.4]
+* **Adafruit SH110X** by Adafruit [v2.1.14] (for the 1.3INCH OLED)
+* **Adafruit NeoPixel** by Adafruit [v1.15.2]
+* **Adafruit MPU6050** by Adafruit [v2.x.x]
+* **Adafruit Unified Sensor** by Adafruit [v1.1.15]
+* **WiFi** (Built-in ESP32 library)
+* **HTTPClient** (Built-in ESP32 library)
+* **WiFiClientSecure** (Built-in ESP32 library)
+
 
 
 ## Hardware Used in The Project
