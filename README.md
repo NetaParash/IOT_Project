@@ -36,7 +36,7 @@ Using a sliding window enables us to smooth out noisy measurements and ignore mo
 
 ## Code Structure & Class Overview
 
-The project is written in C++ (Arduino framework) and consists of the following modules:
+The `Bottle` code is written in C++ (Arduino framework) and consists of the following modules:
 
 ### Core Logic
 * **`Main.ino`**: The entry point. It manages the main loop, coordinates the state machine (Home, Menu, Reset), and integrates all hardware components.
