@@ -142,6 +142,9 @@ enum MenuState {
 
         Serial.println("[MAIN] Pulling settings from backend");
 
+        if (!appClient.isConnectedToWIFI) {
+            screen.print("Trying to connect to WIFI...");
+        }
         auto settings = appClient.getSettings();
 
         if (settings.size() == 3) {
@@ -187,6 +190,9 @@ enum MenuState {
                  currentScreen = STATE_HOME;
 
                  // Send new setting to the application
+                 if (!appClient.isConnectedToWIFI) {
+                     screen.print("Trying to connect to WIFI...");
+                 }
                  appClient.sendSettings(currentMode.name, currentMode.dailyGoal, currentMode.alertEveryMinutes);
 
                  // Reset the notifications timer on mode change
@@ -206,6 +212,9 @@ enum MenuState {
              }
              else if (btnSelect.wasPressed()) {
                  Serial.println("[MAIN] Clearing Water Data");
+                 if (!appClient.isConnectedToWIFI) {
+                     screen.print("Trying to connect to WIFI...");
+                 }
                  appClient.clearEventData();
                  totalDrankML = 0;
                  prefs.putInt("total", totalDrankML);
@@ -266,6 +275,9 @@ enum MenuState {
              // Send water level reading to the application (once in every fixed time interval)
              if (now - lastWaterSendEventMs >= WATER_SEND_EVENT_INTERVAL_MS) {
                  lastWaterSendEventMs = now;
+                 if (!appClient.isConnectedToWIFI) {
+                     screen.print("Trying to connect to WIFI...");
+                 }
                  appClient.sendEvent(totalDrankML, waterML);
              }
          }
