@@ -68,5 +68,5 @@ The project is written in C++ (Arduino framework) and consists of the following 
 * **Sensing:** Copper tape pads connected to ESP32 Touch pins
 
 ### Wires Diagram:
-<img width="909" height="631" alt="wires_diagram" src="https://github.com/user-attachments/assets/e03c81ab-ae25-4adc-a477-7cdc22a96f95" />
+<img width="500" alt="wires_diagram" src="https://github.com/user-attachments/assets/e03c81ab-ae25-4adc-a477-7cdc22a96f95" />
 
