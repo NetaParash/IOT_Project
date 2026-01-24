@@ -31,7 +31,6 @@ The system does not measure water flow while you are tilting the bottle. The log
 4.  **Calculation:** If all readings in the window are consistent, the system compares the **current stable level** against the **previous stable level**.
     * If `Current < Previous`, the difference is recorded as a **Drink Event**.
     * The total is updated and synced to the cloud via `AppClient`.
-
 Using a sliding window enables us to smooth out noisy measurements and ignore momentary level changes caused by water moving inside the bottle after it has stabilized.
 ---
 
