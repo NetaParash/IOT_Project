@@ -10,7 +10,7 @@ Many students do not drink enough water during the school day, and teachers lack
 * [cite_start]**Visual Feedback:** An OLED screen displays current status, and an RGB LED provides visual alerts for drinking reminders.
 * [cite_start]**Customizable Modes:** Different modes (e.g., Hydration, Sport, Office) for daily goal and alerts, configurable via the device menu or the app. A custom mode is also available via the app.
 
----
+
 
 ## How It Works
 
@@ -32,7 +32,7 @@ The system does not measure water flow while you are tilting the bottle. The log
     * If `Current < Previous`, the difference is recorded as a **Drink Event**.
     * The total is updated and synced to the cloud via `AppClient`.
 Using a sliding window enables us to smooth out noisy measurements and ignore momentary level changes caused by water moving inside the bottle after it has stabilized.
----
+
 
 ## Code Structure & Class Overview
 
@@ -57,7 +57,7 @@ The project is written in C++ (Arduino framework) and consists of the following 
 * **`Screen.h` / `Screen.cpp`**: Controls the **OLED display**. It renders the home dashboard, menus, and Wi-Fi status indicator.
 * **`LightNotifier.h`**: Controls the **NeoPixel**. It manages visual alerts (blinking blue lights) to remind the user to drink based on the time interval defined in the current mode.
 
----
+
 
 ## Hardware Used in The Project
 * **Microcontroller:** ESP32
