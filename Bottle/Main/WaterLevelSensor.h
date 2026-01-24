@@ -1,7 +1,3 @@
-/*
- * - Water levels are scanned from Bottom (Level 1) to Top (Level 4).
- */
-
 #include <Arduino.h>
 #include <vector>
 #include <driver/touch_pad.h>
@@ -22,8 +18,8 @@ private:
     int thresh_mid_high;
 
     // These fields are updated by the update() method, using the touch pad's pre-defined thresholds.
-    bool _isWet;       // Is water touching this pad?
-    bool _isTopHalf;   // Is water in the upper 50% of this pad?
+    bool _isWet;       // Is water touching this pad
+    bool _isTopHalf;   // Is water in the upper 50% of this pad
 
 public:
     WaterProbe(uint8_t pin, int wet_low, int wet_high, int mid_low, int mid_high) : _pin(pin), _isWet(false),
@@ -115,16 +111,16 @@ public:
         int score = 0;
 
         if (activeProbeIndex == -1) {
-            score = 0; // Bottle is empty
+            score = 0;
         } else {
             // Add 2 points for every fully wet probe below the active one
             score += (activeProbeIndex * 2);
 
             // Add 1 or 2 points for the active probe itself
             if (_probes[activeProbeIndex].isTopHalf()) {
-                score += 2; // Top half is wet
+                score += 2;
             } else {
-                score += 1; // Only bottom half is wet
+                score += 1;
             }
         }
         // Convert the score to a percentage between 0 and 100.

@@ -6,18 +6,16 @@
 class Button {
 private:
     int pin;
-
-    // --- Added for edge detection ---
-    bool lastState = false;      // previous reading
-    bool pressedEvent = false;   // becomes true only on rising edge
+    bool lastState = false;
+    bool pressedEvent = false;
 
 public:
     Button(int pin);
     void setup();
-    bool isPressed();     // HIGH when held
-    bool wasPressed();    // NEW: true only once per click
+    bool isPressed();
+    bool wasPressed();
 
-    void update();        // NEW: must be called each loop
+    void update();
 };
 
 #endif

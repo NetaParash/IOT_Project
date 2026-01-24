@@ -18,14 +18,11 @@ private:
     const float GYRO_THRESHOLD = 5.0;          // deg/sec
     const int STABILITY_WINDOW_MS = 10;        // ms
     const float ACCEL_TILT_THRESHOLD = 0.15;   // g
+    const float baseGx = -1.92;
+    const float baseGy = -0.68;
+    const float baseGz = -0.05;
 
-    // ---- FIXED GYRO CALIBRATION (YOUR VALUES) ----
-const float baseGx = -1.92;
-const float baseGy = -0.68;
-const float baseGz = -0.05;
-
-
-    // ---- Accelerometer baseline (auto) ----
+    // ---- Accelerometer baseline ----
     float baseAx = 0;
     float baseAy = 0;
     float baseAz = 1.0;
@@ -75,7 +72,7 @@ public:
             sensors_event_t accel, gyro, temp;
             mpu.getEvent(&accel, &gyro, &temp);
 
-            // ---- Gyro: compare RELATIVE to baseline ----
+            // ---- Gyro ----
             float gx = gyro.gyro.x * 180 / PI;
             float gy = gyro.gyro.y * 180 / PI;
             float gz = gyro.gyro.z * 180 / PI;
@@ -103,10 +100,8 @@ public:
             {
                 return false;
             }
-
             delay(1);
         }
-
         return true;
     }
 };

@@ -12,11 +12,10 @@ bool Button::isPressed() {
     return digitalRead(pin) == LOW;
 }
 
-// --- NEW: must be called each loop ---
 void Button::update() {
     bool reading = digitalRead(pin);
 
-    // Detect rising edge (HIGH -> LOW)
+    // (HIGH -> LOW)
     if (reading == LOW && lastState == HIGH) {
         pressedEvent = true;
     }
@@ -24,7 +23,6 @@ void Button::update() {
     lastState = reading;
 }
 
-// --- NEW: returns true only once per press ---
 bool Button::wasPressed() {
     if (pressedEvent) {
         pressedEvent = false;

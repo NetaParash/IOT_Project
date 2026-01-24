@@ -21,7 +21,7 @@ unsigned long lastSettingsPullMs = 0;
 unsigned long lastWaterSendEventMs = 0;
 
  // ========================
- // WATER LEVEL PINS & THRESHOLDS (ordered Bottom -> Top)
+ // WATER LEVEL PINS & THRESHOLDS (order: Bottom -> Top)
  // ========================
  vector<int> touch_pads_pins = {32, 15, 33, 13};
 // 4 thresholds per probe: To ensure stability, we use dual thresholds:

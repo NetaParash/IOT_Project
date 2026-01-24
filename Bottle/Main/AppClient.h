@@ -9,7 +9,7 @@
 
 class AppClient {
 public:
-    // Boolean flag maintaining state from the last connection attempt via connectWiFi function.
+    // flag of state of connectWiFi function.
     // This flag is used to reflect the current state, without making another connection attempt.
     bool isConnectedToWIFI;
 
@@ -34,7 +34,7 @@ public:
     /* ========================
        WiFi connection
        ======================== */
-    bool connectWiFi(unsigned long timeoutMs = 5000) {
+    bool connectWiFi(unsigned long timeoutMs = 1000) {
         if (WiFi.status() == WL_CONNECTED) {
             Serial.println("[WiFi] already connected");
             isConnectedToWIFI = true;

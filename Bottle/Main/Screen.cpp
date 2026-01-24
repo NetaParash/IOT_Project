@@ -8,8 +8,6 @@ Screen::Screen(HardwareSerial& s, int sda, int scl)
       display(128, 64, &Wire) {}
 
 void Screen::setup() {
-    // Wire.begin(sdaPin, sclPin);
-
     display.begin(OLED_ADDR, true);
     display.clearDisplay();
     display.setTextSize(1);
