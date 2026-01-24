@@ -109,7 +109,7 @@ export default function DrinkingAmountGraph() {
                     {
                         label: "ml",
                         min: 0,
-                        max: goal,
+                        max: 1.25*goal,
                     },
                 ]}
 
