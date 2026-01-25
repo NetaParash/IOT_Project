@@ -81,7 +81,7 @@ public:
     void setup() {
         touch_pad_init();
         touch_pad_set_voltage(TOUCH_HVOLT_2V7, TOUCH_LVOLT_0V5, TOUCH_HVOLT_ATTEN_1V);
-        touch_pad_filter_start(10);
+        touch_pad_filter_start(TOUCH_PAD_FILTER_POLLING);
 
         for (auto& probe : _probes) {
             probe.setup();
@@ -123,6 +123,9 @@ public:
                 score += 1;
             }
         }
+
+        debugRaw();
+
         // Convert the score to a percentage between 0 and 100.
         return _calculatePercentage(score);
     }
@@ -144,5 +147,15 @@ public:
             Serial.print("\t");
         }
         Serial.println();
+    }
+
+    String debugRawToText() {
+        String output = "";
+        for (auto& probe : _probes) {
+            output += probe.getRawReading();
+            output += "\t";
+        }
+        output += "\n";
+        return output;
     }
 };

@@ -14,7 +14,8 @@ const unsigned long SCREEN_REFRESH_RATE_MS = 150;
 // ========================
 // WATER MEASUREMENT
 // ========================
-const int SLIDING_WINDOW_SIZE = 20;
+const int SLIDING_WINDOW_SIZE = 30;
+const int TOUCH_PAD_FILTER_POLLING = 10;
 
 // ========================
 // WIFI
