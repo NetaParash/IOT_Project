@@ -100,7 +100,6 @@ The following libraries were used in this project.
 * **WiFiClientSecure** (Built-in ESP32 library)
 
 
-
 ## Hardware Used in The Project
 * **Microcontroller:** ESP32
 * **Gyro:** MPU6050 (Accelerometer/Gyroscope)
@@ -111,4 +110,7 @@ The following libraries were used in this project.
 
 ### Wires Diagram:
 <img width="500" alt="wires_diagram" src="https://github.com/user-attachments/assets/e03c81ab-ae25-4adc-a477-7cdc22a96f95" />
+
+## Project Poster
+[Poster - Smart Bottle.pdf](https://github.com/user-attachments/files/24848603/Poster.-.Smart.Bottle.pdf)
 
