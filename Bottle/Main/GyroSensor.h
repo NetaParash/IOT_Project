@@ -15,7 +15,7 @@ private:
     int sdaPin, sclPin, vccPin;
 
     // Thresholds for stability
-    const float GYRO_THRESHOLD = 5.0;          // deg/sec
+    const float GYRO_THRESHOLD = 4.0;          // deg/sec
     const int STABILITY_WINDOW_MS = 10;        // ms
     const float ACCEL_TILT_THRESHOLD = 0.15;   // g
     const float baseGx = -1.92;
