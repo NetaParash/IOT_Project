@@ -26,7 +26,7 @@ The bottle uses **Capacitive Touch Sensing** to measure water volume non-intrusi
 The system does not measure water flow while you are tilting the bottle. The logic is as follows:
 
 1.  **Stability Check:** The `GyroSensor` (MPU6050) constantly monitors the bottle's movement.
-2.  **Sampling:** When the bottle becomes stable (accel/gyro variations drop below a threshold), the system begins sampling the water level.
+2.  **Sampling:** When the bottle becomes stable (accel/gyro variations drop below a threshold), the system begins sampling the water level, using the logic in `WaterLevelSensor.h`.
 3.  **Sliding Window:** It uses a sliding window (buffer) with 20 consecutive water-level readings.
 4.  **Calculation:** If all readings in the window are consistent, the system compares the **current stable level** against the **previous stable level**.
     * If `Current < Previous`, the difference is recorded as a **Drink Event**.
@@ -36,24 +36,52 @@ Using a sliding window enables us to smooth out noisy measurements and ignore mo
 
 ## Code Structure & Class Overview
 
+### Project Structure
+
+```
+.
+├── Bottle
+│   └── Main
+│       ├── AppClient.h        # Wi-Fi & Backend communication
+│       ├── BottleMode.h       # Data structures for goals/modes
+│       ├── ButtonInput.h      # Button interface
+│       ├── GyroSensor.h       # Gyro stability check
+│       ├── LightNotifier.h    # NeoPixel LED
+│       ├── Main.ino           # Main entry point & state machine
+│       ├── Parameters.h       # Global constants & configuration
+│       ├── Screen.cpp         # OLED display implementation
+│       ├── Screen.h           # OLED display interface
+│       └── WaterLevelSensor.h # Capacitive sensor & water level measurement logic
+├── HW_unit_tests              # Initial hardware testing
+├── backend                    # Server-side code
+├── frontend                   # Mobile/Web app code
+└── README.md
+```
+
+### Frontend / Backend Documentation
+For details on the mobile/web application, see the [Frontend README](frontend/README.md).
+
+For details on the server-side code, see the [Backend README](backend/README.md).
+
+### Bottle Core Logic
+
 The `Bottle` code is written in C++ (Arduino framework) and consists of the following modules:
 
-### Core Logic
 * **`Main.ino`**: The entry point. It manages the main loop, coordinates the state machine (Home, Menu, Reset), and integrates all hardware components.
-* **`Parameters.h`**: Stores global configuration variables, pin definitions, Wi-Fi settings, and constants (bottle volume, thresholds).
+* **`Parameters.h`**: Stores global configuration variables, Wi-Fi settings, and constants (bottle volume, thresholds).
 
-### Sensors & Inputs
-* **`WaterLevelSensor.h`**: Manages the capacitive touch pads. It converts raw capacitance data into a discrete water level between 0 and 8, converted to percentage and Milliliters (mL). It handles the logic for the 8 discrete steps by detecting wet/dry and mid-point thresholds.
-* **`GyroSensor.h`**: Interfaces with the **MPU6050**. It determines if the bottle is currently stable (resting) or moving/tilting to prevent water sloshing from creating false readings.
-* **`ButtonInput.h`**: Handles physical button interactions (Next/Select). It includes debouncing logic and edge detection (`wasPressed`) to ensure single-click responsiveness.
+#### Sensors & Inputs
+* **`WaterLevelSensor.h`**: Manages the capacitive touch pads. It converts raw capacitance data into a discrete water level between 0 and 8, converted to percentage and Milliliters (mL). It handles the logic for the 8 discrete steps by detecting wet/dry and mid-point thresholds, having two different numeric thresholds for each point, serving as a **"gray area"**. We then process the pads from the **bottom up** and stop scanning at the first dry sensor. This logic filters out false positives from holding the bottle, as water readings require a continuous touch starting from the bottom.
+* **`GyroSensor.h`**: Interfaces with the **MPU6050**. It determines if the bottle is currently stable (resting) or moving/tilting to prevent false readings.
+* **`ButtonInput.h`**: Handles physical buttons (Next/Select). It includes debouncing logic and edge detection (`wasPressed`) to ensure single-click responsiveness.
 
-### Connectivity & Data
+#### Connectivity & Data
 * **`AppClient.h`**: Handles Wi-Fi connectivity and HTTP REST API communication.
     * `sendEvent()`: Pushes water level and total consumed to the backend.
     * `getSettings()`: Pulls user preferences (Goals, Modes) from the server.
 * **`BottleMode.h`**: Defines the data structure for different operating modes (e.g., "Hydration", "Sport"). Holds the logic for daily goals and alert intervals.
 
-### User Interface (Outputs)
+#### User Interface (Outputs)
 * **`Screen.h` / `Screen.cpp`**: Controls the **OLED display**. It renders the home dashboard, menus, and Wi-Fi status indicator.
 * **`LightNotifier.h`**: Controls the **NeoPixel**. It manages visual alerts (blinking blue lights) to remind the user to drink based on the time interval defined in the current mode.
 
@@ -75,7 +103,7 @@ The following libraries were used in this project.
 
 ## Hardware Used in The Project
 * **Microcontroller:** ESP32
-* **IMU:** MPU6050 (Accelerometer/Gyroscope)
+* **Gyro:** MPU6050 (Accelerometer/Gyroscope)
 * **Display:** 1.3INCH OLED
 * **LED:** 3 lights NeoPixel strip
 * **Inputs:** 2 Buttons
