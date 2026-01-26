@@ -1,6 +1,7 @@
-
 #ifndef IOT_PROJECT_DEFINITIONS_H
 #define IOT_PROJECT_DEFINITIONS_H
+
+#include "secrets.h"
 
 const unsigned long SETTINGS_PULL_INTERVAL_MS = (30 * 1000); // 30 seconds
 const unsigned long WATER_SEND_EVENT_INTERVAL_MS = (30 * 1000); // 30 seconds
@@ -19,9 +20,8 @@ const int TOUCH_PAD_FILTER_POLLING = 10;
 
 // ========================
 // WIFI
-// ========================
-const char* WIFI_NAME = "OrZ iPhone";
-const char* WIFI_PASSWORD = "g0iibm9ik7ry";
+const char* WIFI_NAME = SECRET_SSID;
+const char* WIFI_PASSWORD = SECRET_PASS;
 const char* APP_URL = "https://iot-project-6i3k.onrender.com";
 
 // ========================

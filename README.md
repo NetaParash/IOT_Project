@@ -2,6 +2,12 @@
 
 Many students do not drink enough water during the school day, and teachers lack real-time visibility into students’ hydration status. This project features a smart water bottle and a companion app that automatically tracks drinking habits and provides real-time hydration monitoring for students and teachers.
 
+## Setup
+For security reasons, the Wi-Fi credentials are not included in the source code. To set up your own credentials:
+1.  Locate the file `Bottle/Main/secrets_template.h`.
+2. Rename it to `secrets.h` (or create a new file named `secrets.h`).
+3. Open the file and fill in your Wi-Fi SSID and Password.
+
 ## Key Features
 
 * **Real-time Tracking:** Automatically calculates the amount of water consumed.
@@ -51,6 +57,7 @@ Using a sliding window enables us to smooth out noisy measurements and ignore mo
 │       ├── Parameters.h       # Global constants & configuration
 │       ├── Screen.cpp         # OLED display implementation
 │       ├── Screen.h           # OLED display interface
+│       ├── secrets_template.h # Template for secrets.h file
 │       └── WaterLevelSensor.h # Capacitive sensor & water level measurement logic
 ├── HW_unit_tests              # Initial hardware testing
 ├── backend                    # Server-side code
