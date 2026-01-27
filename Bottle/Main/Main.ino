@@ -292,7 +292,7 @@ void loop() {
 
         // Check stability first
         if (!stable && currentScreen == STATE_HOME) {
-            screen.print("Please maintain\nthe bottle stable!");
+            screen.showStabilityMessage();
         }
         else {
             switch (currentScreen) {

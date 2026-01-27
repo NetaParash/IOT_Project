@@ -75,3 +75,11 @@ void Screen::showResetScreen() {
     text += _getWifiText();
     print(text);
 }
+
+void Screen::showStabilityMessage() {
+    String text = "Please maintain\nthe bottle stable!";
+
+    text += "\n\n\n\n---------------------\n";
+    text += _getWifiText();
+    print(text);
+}

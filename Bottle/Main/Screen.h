@@ -33,6 +33,7 @@ public:
     void showHome(String modeName, int dailyGoal, int totalDrank, int currentLevel);
     void showModeMenu(String modeName, int dailyGoal);
     void showResetScreen();
+    void showStabilityMessage();
 };
 
 #endif
