@@ -59,6 +59,7 @@ Using a sliding window enables us to smooth out noisy measurements and ignore mo
 │       ├── Screen.h           # OLED display interface
 │       ├── secrets_template.h # Template for secrets.h file
 │       └── WaterLevelSensor.h # Capacitive sensor & water level measurement logic
+├── build                      # Compiled binary of the Bottle
 ├── HW_unit_tests              # Initial hardware testing
 ├── backend                    # Server-side code
 ├── frontend                   # Mobile/Web app code
