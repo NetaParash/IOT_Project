@@ -24,16 +24,6 @@ unsigned long lastWaterSendEventMs = 0;
 // WATER LEVEL PINS & THRESHOLDS (order: Bottom -> Top)
 // ========================
 vector<int> touch_pads_pins = {32, 15, 33, 13};
-// 4 thresholds per probe: To ensure stability, we use dual thresholds:
-// Wet state: Drop below WET-LOW to activate, rise above WET-HIGH to clear.
-// Mid-point: Drop below MID-LOW for "top half", rise above MID-HIGH for "bottom".
-vector<vector<int>> thresholds = {
-        // wet-low thresh, wet-high thresh, mid-low thresh, mid-high thresh
-        {570, 630, 455, 470},
-        {580, 615, 425, 445},
-        {550, 610, 420, 435},
-        {520, 560, 400, 420},
-};
 WaterLevelSensor waterLevelSensor(touch_pads_pins, thresholds);
 
 // ========================
